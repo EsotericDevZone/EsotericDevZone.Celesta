@@ -5,9 +5,9 @@ namespace EsotericDevZone.Celesta.Parser.ParseTree
     internal class WhileBlock : IParseTreeNode
     {
         public IParseTreeNode Condition { get; }
-        public IParseTreeNode Loop { get; }
+        public Block Loop { get; }
 
-        public WhileBlock(IParseTreeNode condition, IParseTreeNode loop)
+        public WhileBlock(IParseTreeNode condition, Block loop)
         {
             Condition = condition;
             Loop = loop;

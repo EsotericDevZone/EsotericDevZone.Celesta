@@ -1,11 +1,4 @@
-﻿using EsotericDevZone.Celesta.Parser.ParseTree;
-using EsotericDevZone.RuleBasedParser;
-using EsotericDevZone.RuleBasedParser.Presets;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using EsotericDevZone.RuleBasedParser.Presets;
 
 namespace EsotericDevZone.Celesta.Parser
 {
@@ -97,7 +90,6 @@ namespace EsotericDevZone.Celesta.Parser
             ParseRules.RegisterRule("@CODE", "@BLOCK", ParseResultBuilders.Self);
             ParseRules.RegisterRule("@CODE", "@INSTR", ParseResultBuilders.Self);
             ParseRules.RegisterRule("@CODE", "@EXPR", ParseResultBuilders.Self);
-
 
 
             RootRuleKey = "@CODE";

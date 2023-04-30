@@ -54,23 +54,22 @@ namespace EsotericDevZone.Celesta.Parser
         {
             if (results.Length == 2)
                 return new ParseResult(results[0].GeneratorToken,
-                    new IfBlock(results[0].Value as IParseTreeNode, results[1].Value as IParseTreeNode));
-            if (results.Length == 3)
+                    new IfBlock(results[0].Value as IParseTreeNode, results[1].Value as Block));
+            else //if (results.Length == 3)
                 return new ParseResult(results[0].GeneratorToken,
-                    new IfBlock(results[0].Value as IParseTreeNode, results[1].Value as IParseTreeNode, results[2].Value as IParseTreeNode));
-            throw new ParseException("Invalid if block");
+                    new IfBlock(results[0].Value as IParseTreeNode, results[1].Value as Block, results[2].Value as Block));
         }
 
         public static ParseResult While(ParseResult[] results)
         {            
             return new ParseResult(results[0].GeneratorToken,
-                    new WhileBlock(results[0].Value as IParseTreeNode, results[1].Value as IParseTreeNode));
+                    new WhileBlock(results[0].Value as IParseTreeNode, results[1].Value as Block));
         }
 
         public static ParseResult RepeatN(ParseResult[] results)
         {
             return new ParseResult(results[0].GeneratorToken,
-                    new RepeatNBlock(results[0].Value as IParseTreeNode, results[1].Value as IParseTreeNode));
+                    new RepeatNBlock(results[0].Value as IParseTreeNode, results[1].Value as Block));
         }
 
         public static ParseResult Block(ParseResult[] results) =>
@@ -90,19 +89,19 @@ namespace EsotericDevZone.Celesta.Parser
         public static ParseResult ArgumentDeclaration(ParseResult[] results)
         {            
             return new ParseResult(results[0].GeneratorToken,
-                new FunctionArgumentDeclaration(results[0].Value as IParseTreeNode, results[1].Value as string));            
+                new FunctionArgumentDeclaration(results[0].Value as Identifier, results[1].Value as string));            
         }
 
         public static ParseResult TypeAlias(ParseResult[] results)
         {
             return new ParseResult(results[0].GeneratorToken, 
-                new TypeAlias(results[0].Value as string, results[1].Value as IParseTreeNode, false));
+                new TypeAlias(results[0].Value as string, results[1].Value as Identifier, false));
         }
 
         public static ParseResult TypeAliasIsolated(ParseResult[] results)
         {
             return new ParseResult(results[0].GeneratorToken,
-                new TypeAlias(results[0].Value as string, results[1].Value as IParseTreeNode, true));
+                new TypeAlias(results[0].Value as string, results[1].Value as Identifier, true));
         }
 
         public static ParseResult SyscallFunctionHeader(ParseResult[] results)
@@ -135,8 +134,8 @@ namespace EsotericDevZone.Celesta.Parser
         }
 
         public static ParseResult Package(ParseResult[] results)
-        {
-            return new ParseResult(results[0].GeneratorToken, new Package(results[0].Value as string, results[1].Value as IParseTreeNode));
+        {            
+            return new ParseResult(results[0].GeneratorToken, new Package(results[0].Value as string, results[1].Value as Block));
         }
 
         public static ParseResult Return(ParseResult[] results, Token[] tokens)

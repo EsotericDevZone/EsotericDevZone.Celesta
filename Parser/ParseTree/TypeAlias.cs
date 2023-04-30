@@ -9,11 +9,11 @@ namespace EsotericDevZone.Celesta.Parser.ParseTree
     internal class TypeAlias : IParseTreeNode
     {
         public string TypeName { get; }
-        public IParseTreeNode ReferencedType { get; }
+        public Identifier ReferencedType { get; }
 
         public bool Isolated { get; }
 
-        public TypeAlias(string typeName, IParseTreeNode referencedType, bool isolated)
+        public TypeAlias(string typeName, Identifier referencedType, bool isolated)
         {
             TypeName = typeName;
             ReferencedType = referencedType;

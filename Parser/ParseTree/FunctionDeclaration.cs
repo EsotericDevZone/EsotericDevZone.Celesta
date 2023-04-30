@@ -2,7 +2,7 @@
 
 namespace EsotericDevZone.Celesta.Parser.ParseTree
 {
-    internal class FunctionDeclaration
+    internal class FunctionDeclaration : IParseTreeNode
     {
         public string Name { get; }
         public FunctionArgumentDeclaration[] Arguments { get; }

@@ -8,10 +8,10 @@ namespace EsotericDevZone.Celesta.Parser.ParseTree
 {
     internal class FunctionArgumentDeclaration : IParseTreeNode
     {
-        public IParseTreeNode DataType { get; }
+        public Identifier DataType { get; }
         public string Name { get; }
 
-        public FunctionArgumentDeclaration(IParseTreeNode dataType, string name)
+        public FunctionArgumentDeclaration(Identifier dataType, string name)
         {
             DataType = dataType;
             Name = name;

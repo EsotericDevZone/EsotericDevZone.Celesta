@@ -10,9 +10,9 @@ namespace EsotericDevZone.Celesta.Parser.ParseTree
     internal class Package : IParseTreeNode
     {
         public string Name { get; }
-        public IParseTreeNode Content { get; }
+        public Block Content { get; }
 
-        public Package(string name, IParseTreeNode content)
+        public Package(string name, Block content)
         {
             Name = name;
             Content = content;

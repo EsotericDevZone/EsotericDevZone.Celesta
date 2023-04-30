@@ -6,17 +6,17 @@ namespace EsotericDevZone.Celesta.Parser.ParseTree
     {
         public IParseTreeNode Condition { get; }
 
-        public IParseTreeNode ThenBranch { get; }
-        public IParseTreeNode ElseBranch { get; }
+        public Block ThenBranch { get; }
+        public Block ElseBranch { get; }
 
-        public IfBlock(IParseTreeNode condition, IParseTreeNode thenBranch, IParseTreeNode elseBranch)
+        public IfBlock(IParseTreeNode condition, Block thenBranch, Block elseBranch)
         {
             Condition = condition;
             ThenBranch = thenBranch;
             ElseBranch = elseBranch;
         }
 
-        public IfBlock(IParseTreeNode condition, IParseTreeNode thenBranch) : this(condition, thenBranch, null) { }
+        public IfBlock(IParseTreeNode condition, Block thenBranch) : this(condition, thenBranch, null) { }
 
 
         public override string ToString()

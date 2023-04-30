@@ -1,13 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EsotericDevZone.Celesta.AST
 {
-    internal interface IASTNode
+    public interface IASTNode
     {
+        IASTNode Parent { get; }
+
+        string GetScopeName();
+        string GetPackageName();
+
+        bool IsIncludedIn(Type nodeType);        
+        bool IsDirectlyIncludedIn(Type nodeType);        
+        
 
     }
 }

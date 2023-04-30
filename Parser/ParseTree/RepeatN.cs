@@ -10,9 +10,9 @@ namespace EsotericDevZone.Celesta.Parser.ParseTree
     internal class RepeatNBlock : IParseTreeNode
     {
         public IParseTreeNode Count { get; }
-        public IParseTreeNode Loop { get; }
+        public Block Loop { get; }
 
-        public RepeatNBlock(IParseTreeNode count, IParseTreeNode loop)
+        public RepeatNBlock(IParseTreeNode count, Block loop)
         {
             Count = count;
             Loop = loop;

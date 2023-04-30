@@ -34,6 +34,9 @@
     <ApplicationIcon>esodev2.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Astralbrew.Celesta">
+      <HintPath>..\..\Astralbrew.Celesta\Astralbrew.Celesta\bin\Debug\Astralbrew.Celesta.dll</HintPath>
+    </Reference>
     <Reference Include="EsotericDevZone.Core, Version=1.0.6.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\EsotericDevZone.Core.1.0.6\lib\net46\EsotericDevZone.Core.dll</HintPath>
     </Reference>
@@ -50,7 +53,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AST\AbstractASTNode.cs" />
+    <Compile Include="AST\BlockNode.cs" />
     <Compile Include="AST\IASTNode.cs" />
+    <Compile Include="AST\IBlockNode.cs" />
     <Compile Include="Definitions\AbstractSymbol.cs" />
     <Compile Include="Definitions\DataType.cs" />
     <Compile Include="Definitions\ISymbol.cs" />
