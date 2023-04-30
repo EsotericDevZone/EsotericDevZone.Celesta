@@ -139,5 +139,15 @@ namespace EsotericDevZone.Celesta.Parser
             return new ParseResult(results[0].GeneratorToken, new Package(results[0].Value as string, results[1].Value as IParseTreeNode));
         }
 
+        public static ParseResult Return(ParseResult[] results, Token[] tokens)
+        {
+            return new ParseResult(tokens[0], new Return(results.FirstOrDefault()?.Value as IParseTreeNode));
+        }
+
+        public static ParseResult UnaryOperator(ParseResult[] results, Token[] tokens)
+        {
+            return new ParseResult(tokens[0], new UnaryOperator(tokens[0], results[0].Value as IParseTreeNode));
+        }
+
     }
 }

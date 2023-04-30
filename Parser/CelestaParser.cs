@@ -36,7 +36,8 @@ namespace EsotericDevZone.Celesta.Parser
             ParseRules.RegisterRule("@STERM", "@IDENTIFIER", ParseResultBuilders.Self);
             ParseRules.RegisterRule("@STERM", "NUMBER", ParseResultBuilders.Self);
             ParseRules.RegisterRule("@STERM", "STRING", ParseResultBuilders.Self);
-            ParseRules.RegisterRule("@STERM", "( @EXPR )", ParseResultBuilders.Self);                        
+            ParseRules.RegisterRule("@STERM", "( @EXPR )", ParseResultBuilders.Self);
+            ParseRules.RegisterRule("@STERM", "+|- @EXPR", ParseTreeNodeBuilders.UnaryOperator);
 
             ParseRules.RegisterRule("@FTERM", "@STERM . SYMBOL ?? . SYMBOL", ParseTreeNodeBuilders.NameAccessor);
             ParseRules.RegisterRule("@FTERM", "@STERM", ParseResultBuilders.Self);
@@ -76,6 +77,9 @@ namespace EsotericDevZone.Celesta.Parser
 
             ParseRules.RegisterRule("@PACKAGE", "package SYMBOL @BLOCK end|endpackage", ParseTreeNodeBuilders.Package);
 
+            ParseRules.RegisterRule("@RETURN", "return|return @EXPR", ParseTreeNodeBuilders.Return);
+            ParseRules.RegisterRule("@RETURN", "return|return", ParseTreeNodeBuilders.Return);
+
             ParseRules.RegisterRule("@BLOCK", "@INSTR ; ?? @INSTR ;", ParseTreeNodeBuilders.Block);
 
             ParseRules.RegisterRule("@INSTR", "@WHILE", ParseResultBuilders.Self);
@@ -84,6 +88,7 @@ namespace EsotericDevZone.Celesta.Parser
             ParseRules.RegisterRule("@INSTR", "@PACKAGE", ParseResultBuilders.Self);
             ParseRules.RegisterRule("@INSTR", "@TALIAS", ParseResultBuilders.Self);
             ParseRules.RegisterRule("@INSTR", "@SYSCALLFDECL", ParseResultBuilders.Self);
+            ParseRules.RegisterRule("@INSTR", "@RETURN", ParseResultBuilders.Self);
             ParseRules.RegisterRule("@INSTR", "@FDECL", ParseResultBuilders.Self);
             ParseRules.RegisterRule("@INSTR", "@VDECL", ParseResultBuilders.Self);
             ParseRules.RegisterRule("@INSTR", "@ASSIGN", ParseResultBuilders.Self);

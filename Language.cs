@@ -13,7 +13,7 @@ namespace EsotericDevZone.Celesta
             "package", "endpackage",
 
             "type", "record", "endrecord",
-            "function", "endfunction", "begin", 
+            "function", "endfunction", "begin", "return",
             
             "syscall"
             );

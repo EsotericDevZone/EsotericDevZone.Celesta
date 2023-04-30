@@ -6,25 +6,33 @@ namespace EsotericDevZone.Celesta.Parser
 {
     internal static class ParseTreeAtomBuilders
     {
-        public static object StringLiteral(string input)
+        public static AtomResult StringLiteral(string input)
         {
-            _ = AtomBuilders.DoubleQuotedString(input) as string;            
-            return new StringLiteral(input);
+            var atom = AtomBuilders.DoubleQuotedString(input);
+            if (atom.Failed)
+                return AtomResult.Error($"Not a string: '{input}'");
+            return AtomResult.Atom(new StringLiteral(input));
         }
 
-        public static object SymbolLiteral(string input)
+        public static AtomResult SymbolLiteral(string input)
         {
-            var symbol = AtomBuilders.Symbol(input) as string;
+            var atom = AtomBuilders.Symbol(input);
+            if (atom.Failed)
+                return atom;
+
+            var symbol = atom.Value as string;
             if (Language.Keywords.Contains(symbol))
-                throw new ParseException("Symbol excpected, keyword found");
-            return symbol;
+                return AtomResult.Error($"Symbol expected, keyword found : {input}");
+            return AtomResult.Atom(symbol);
         }
 
-        public static object NumberLiteral(string input)
+        public static AtomResult NumberLiteral(string input)
         {
-            if (double.TryParse(input, out double _))
-                return new NumericLiteral(input);
-            throw new ParseException($"Not a number literal: '{input}'");
+            var atom = AtomBuilders.Number(input);
+            if (atom.Failed)
+                return AtomResult.Error($"Not a number literal: '{input}'");
+
+            return AtomResult.Atom(new NumericLiteral(input));            
         }
     }
 }

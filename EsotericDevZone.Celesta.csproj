@@ -57,6 +57,7 @@
     <Compile Include="Definitions\SymbolInitializationException.cs" />
     <Compile Include="Extensions\SymbolExtensions.cs" />
     <Compile Include="Language.cs" />
+    <Compile Include="Parser\LiteralException.cs" />
     <Compile Include="Parser\ParseTree\Block.cs" />
     <Compile Include="Parser\ParseTree\FunctionArgumentDeclaration.cs" />
     <Compile Include="Parser\ParseTree\FunctionDeclaration.cs" />
@@ -75,9 +76,11 @@
     <Compile Include="Parser\ParseTree\NumericLiteral.cs" />
     <Compile Include="Parser\ParseTree\Package.cs" />
     <Compile Include="Parser\ParseTree\RepeatN.cs" />
+    <Compile Include="Parser\ParseTree\Return.cs" />
     <Compile Include="Parser\ParseTree\StringLiteral.cs" />
     <Compile Include="Parser\ParseTree\SyscallFunctionHeader.cs" />
     <Compile Include="Parser\ParseTree\TypeAlias.cs" />
+    <Compile Include="Parser\ParseTree\UnaryOperator.cs" />
     <Compile Include="Parser\ParseTree\VariableDeclaration.cs" />
     <Compile Include="Parser\ParseTree\WhileBlock.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
