@@ -34,12 +34,6 @@
     <ApplicationIcon>esodev2.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Astralbrew.Celesta">
-      <HintPath>..\..\Astralbrew.Celesta\Astralbrew.Celesta\bin\Debug\Astralbrew.Celesta.dll</HintPath>
-    </Reference>
-    <Reference Include="EsotericDevZone.Core, Version=1.0.6.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\EsotericDevZone.Core.1.0.6\lib\net46\EsotericDevZone.Core.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
@@ -54,13 +48,32 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AST\AbstractASTNode.cs" />
-    <Compile Include="AST\BlockNode.cs" />
+    <Compile Include="AST\AbstractExpressionNode.cs" />
+    <Compile Include="AST\AssignmentNode.cs" />
+    <Compile Include="AST\ASTBuilder.cs" />
+    <Compile Include="AST\ASTBuildNodeException.cs" />
+    <Compile Include="AST\OperatorNode.cs" />
+    <Compile Include="AST\ScopedNode.cs" />
     <Compile Include="AST\IASTNode.cs" />
     <Compile Include="AST\IBlockNode.cs" />
+    <Compile Include="AST\IExpressionNode.cs" />
+    <Compile Include="AST\IntegerConstantNode.cs" />
+    <Compile Include="AST\PackageNode.cs" />
+    <Compile Include="AST\RealConstantNode.cs" />
+    <Compile Include="AST\StringConstantNode.cs" />
+    <Compile Include="AST\VariableDeclarationNode.cs" />
+    <Compile Include="AST\VariableNode.cs" />
+    <Compile Include="Counters\FunctionalStringCounter.cs" />
+    <Compile Include="Counters\ICounter.cs" />
+    <Compile Include="Counters\IncrementCounter.cs" />
+    <Compile Include="Counters\IStringCounter.cs" />
     <Compile Include="Definitions\AbstractSymbol.cs" />
     <Compile Include="Definitions\DataType.cs" />
+    <Compile Include="Definitions\Function.cs" />
     <Compile Include="Definitions\ISymbol.cs" />
+    <Compile Include="Definitions\Operator.cs" />
     <Compile Include="Definitions\SymbolInitializationException.cs" />
+    <Compile Include="Definitions\Variable.cs" />
     <Compile Include="Extensions\SymbolExtensions.cs" />
     <Compile Include="Language.cs" />
     <Compile Include="Parser\LiteralException.cs" />
@@ -90,6 +103,14 @@
     <Compile Include="Parser\ParseTree\VariableDeclaration.cs" />
     <Compile Include="Parser\ParseTree\WhileBlock.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Providers\AbstractSymbolProvider.cs" />
+    <Compile Include="Providers\DataTypeProvider.cs" />
+    <Compile Include="Providers\FunctionProvider.cs" />
+    <Compile Include="Providers\ISymbolProvider.cs" />
+    <Compile Include="Providers\MultipleDefinitionException.cs" />
+    <Compile Include="Providers\OperatorProvider.cs" />
+    <Compile Include="Providers\VariableProvider.cs" />
+    <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -99,14 +120,16 @@
       <Project>{1b918478-7cb1-40a6-a679-6cde14fbb34b}</Project>
       <Name>CoreShadow</Name>
     </ProjectReference>
+    <ProjectReference Include="..\EsotericDevZone.Core\EsotericDevZone.Core.csproj">
+      <Project>{3897bd01-4139-4f16-b86c-ffb1d66bcba0}</Project>
+      <Name>EsotericDevZone.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EsotericDevZone.RuleBasedParser\EsotericDevZone.RuleBasedParser.csproj">
       <Project>{d7590acb-fa20-4a39-aa3c-f6861ee24838}</Project>
       <Name>EsotericDevZone.RuleBasedParser</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Providers\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Content Include="esodev2.ico" />
   </ItemGroup>

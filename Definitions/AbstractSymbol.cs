@@ -5,6 +5,7 @@
         public string Name { get; }
         public string PackageName { get; }
         public string ScopeName { get; }
+        public string FullName => PackageName == "" ? Name : $"{PackageName}#{Name}";
 
         protected AbstractSymbol(string name, string package, string scope)
         {

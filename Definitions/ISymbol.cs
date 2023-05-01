@@ -4,6 +4,8 @@
     {
         string Name { get; }
         string PackageName { get; }
-        string ScopeName { get; }        
+        string ScopeName { get; }  
+        
+        string FullName { get; }
     }
 }

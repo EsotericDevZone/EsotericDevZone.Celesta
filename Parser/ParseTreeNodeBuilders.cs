@@ -79,10 +79,10 @@ namespace EsotericDevZone.Celesta.Parser
         {
             if (results.Length == 2)
                 return new ParseResult(results[0].GeneratorToken,
-                    new VariableDeclaration(results[0].Value as IParseTreeNode, results[1].Value as string));
+                    new VariableDeclaration(results[0].Value as Identifier, results[1].Value as string));
             if (results.Length == 3)
                 return new ParseResult(results[0].GeneratorToken,
-                    new VariableDeclaration(results[0].Value as IParseTreeNode, results[1].Value as string, results[2].Value as IParseTreeNode));
+                    new VariableDeclaration(results[0].Value as Identifier, results[1].Value as string, results[2].Value as IParseTreeNode));
             throw new ParseException("Invalid variable declaration");            
         }
 

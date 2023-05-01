@@ -21,7 +21,7 @@ namespace EsotericDevZone.Celesta.AST
         public bool IsIncludedIn(Type nodeType)
         {
             CheckTypeIsIASTNode(nodeType);
-            return IsDirectlyIncludedIn(nodeType) || (Parent?.IsIncludedIn(nodeType) ?? false);            
+            return IsDirectlyIncludedIn(nodeType) || (Parent?.IsIncludedIn(nodeType) ?? false);      
         }
 
         protected static void CheckTypeIsIASTNode(Type nodeType)
@@ -30,14 +30,19 @@ namespace EsotericDevZone.Celesta.AST
                             , new ArgumentException("Node Type must be IASTNode derived"));
         }
 
-        public string GetScopeName()
+        public virtual string GetScopeName() => GetScope(Parent);
+
+        public virtual string GetPackageName() => GetPackage(Parent);        
+
+        internal static string GetScope(IASTNode node)
         {
-            throw new NotImplementedException();
+            return node?.GetScopeName() ?? "@main";
         }
 
-        public string GetPackageName()
+        internal static string GetPackage(IASTNode node)
         {
-            throw new NotImplementedException();
+            return node?.GetPackageName() ?? "";
         }
+        
     }
 }

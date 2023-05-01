@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace EsotericDevZone.Celesta.Parser.ParseTree
+﻿namespace EsotericDevZone.Celesta.Parser.ParseTree
 {
     internal class FunctionArgumentDeclaration : IParseTreeNode
     {

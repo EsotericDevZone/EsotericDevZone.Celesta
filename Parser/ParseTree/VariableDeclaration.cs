@@ -2,18 +2,18 @@
 {
     internal class VariableDeclaration : IParseTreeNode
     {
-        public IParseTreeNode DataType { get; }
+        public Identifier DataType { get; }
         public string VariableName { get; }
         public IParseTreeNode InitializationValue { get; }
 
-        public VariableDeclaration(IParseTreeNode dataType, string variableName, IParseTreeNode initializationValue)
+        public VariableDeclaration(Identifier dataType, string variableName, IParseTreeNode initializationValue)
         {
             DataType = dataType;
             VariableName = variableName;
             InitializationValue = initializationValue;
         }
 
-        public VariableDeclaration(IParseTreeNode dataType, string variableName)
+        public VariableDeclaration(Identifier dataType, string variableName)
             : this(dataType, variableName, null) { }
 
         public override string ToString()
