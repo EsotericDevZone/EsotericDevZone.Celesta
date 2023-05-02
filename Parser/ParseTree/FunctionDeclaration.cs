@@ -1,4 +1,5 @@
-﻿using EsotericDevZone.Core;
+﻿using EsotericDevZone.Celesta.Definitions;
+using EsotericDevZone.Core;
 
 namespace EsotericDevZone.Celesta.Parser.ParseTree
 {
@@ -6,9 +7,9 @@ namespace EsotericDevZone.Celesta.Parser.ParseTree
     {
         public string Name { get; }
         public FunctionArgumentDeclaration[] Arguments { get; }
-        public IParseTreeNode DataType { get; }
+        public Identifier DataType { get; }
         public IParseTreeNode Body { get; }
-        public FunctionDeclaration(string name, FunctionArgumentDeclaration[] arguments, IParseTreeNode dataType, IParseTreeNode body)
+        public FunctionDeclaration(string name, FunctionArgumentDeclaration[] arguments, Identifier dataType, IParseTreeNode body)
         {
             Name = name;
             Arguments = arguments;
@@ -16,6 +17,6 @@ namespace EsotericDevZone.Celesta.Parser.ParseTree
             Body = body;
         }
 
-        public override string ToString() => $"{DataType} {Name}({Arguments.JoinToString(",")}) begin\n{Body.ToString().Indent("    ")}\nend";
+        public override string ToString() => $"{DataType} {Name}({Arguments.JoinToString(",")}) begin\n{Body.ToString().Indent("    ")}\nend";        
     }
 }

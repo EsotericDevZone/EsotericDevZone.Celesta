@@ -2,7 +2,7 @@
 
 namespace EsotericDevZone.Celesta.AST
 {
-    internal class AbstractExpressionNode : AbstractASTNode, IExpressionNode
+    public class AbstractExpressionNode : AbstractASTNode, IExpressionNode
     {
         public DataType OutputType { get; }
 

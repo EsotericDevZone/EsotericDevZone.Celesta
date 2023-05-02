@@ -1,4 +1,6 @@
 ﻿using EsotericDevZone.Celesta.Definitions;
+using EsotericDevZone.Celesta.Parser.ParseTree;
+using EsotericDevZone.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,6 +29,16 @@ namespace EsotericDevZone.Celesta.Providers
         {
             return Find(package, name, scope).Where(f => f.ArgumentTypes.SequenceEqual(argTypes)
              && f.OutputType == outputType);
+        }
+
+        public Function Resolve(Identifier identifier, string scope, DataType[] argTypes, bool strict)
+        {
+            var candidates = Find(identifier.PackageName, identifier.Name, scope, argTypes).ToArray();
+            if (candidates.Length == 0)
+                return null;
+            if (strict && candidates.Length > 1)
+                throw new MultipleDefinitionException($"Multiple definitions of function {identifier}({argTypes.JoinToString(",")}):\n{candidates.JoinToString("\n").Indent("  ")}");
+            return candidates[0];
         }
     }
 }

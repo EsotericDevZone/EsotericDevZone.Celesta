@@ -10,7 +10,9 @@ namespace EsotericDevZone.Celesta.AST
         string GetPackageName();
 
         bool IsIncludedIn(Type nodeType);        
-        bool IsDirectlyIncludedIn(Type nodeType);        
+        bool IsDirectlyIncludedIn(Type nodeType);
+
+        T GetClosestParent<T>() where T : class, IASTNode;
         
 
     }

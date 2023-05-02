@@ -43,6 +43,19 @@ namespace EsotericDevZone.Celesta.AST
         {
             return node?.GetPackageName() ?? "";
         }
-        
+
+
+        public T GetClosestParent<T>() where T : class, IASTNode
+        {            
+            return GetClosestParentRec<T>();            
+        }
+
+        private T GetClosestParentRec<T>() where T : class, IASTNode
+        {
+            if (Parent == null) return null;
+            if (Parent is T result)
+                return result;
+            return Parent.GetClosestParent<T>();
+        }
     }
 }

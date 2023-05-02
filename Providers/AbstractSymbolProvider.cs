@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace EsotericDevZone.Celesta.Providers
 {
-    internal class AbstractSymbolProvider<T> : ISymbolProvider<T> where T : ISymbol
+    internal class AbstractSymbolProvider<T> : ISymbolProvider<T> where T : class, ISymbol
     {
         List<T> Symbols = new List<T>();
 
@@ -52,12 +52,22 @@ namespace EsotericDevZone.Celesta.Providers
         {
             var candidates = Find(identifier, scope).ToArray();
             if (candidates.Length == 0)
-                return default(T);
+                return null;
             if (strict && candidates.Length > 1)
                 throw new MultipleDefinitionException($"The identifier '{identifier}' is ambiguous:\n{candidates.JoinToString("\n").Indent("  ")}");
             return candidates[0];
         }
 
-        public IEnumerable<T> Where(Func<T, bool> predicate) => Symbols.Where(predicate);        
+        public IEnumerable<T> Where(Func<T, bool> predicate) => Symbols.Where(predicate);
+
+        public T Resolve(Func<T, bool> predicate, bool strict)
+        {
+            var candidates = Where(predicate).ToArray();
+            if (candidates.Length == 0)
+                return null;
+            if (strict && candidates.Length > 1) 
+                throw new MultipleDefinitionException($"Multiple definitions are matcing constraints:\n{candidates.JoinToString("\n").Indent("  ")}");
+            return candidates[0];
+        }
     }
 }

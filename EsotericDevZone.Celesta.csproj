@@ -52,9 +52,11 @@
     <Compile Include="AST\AssignmentNode.cs" />
     <Compile Include="AST\ASTBuilder.cs" />
     <Compile Include="AST\ASTBuildNodeException.cs" />
+    <Compile Include="AST\FunctionFormalParameterNode.cs" />
     <Compile Include="AST\IfNode.cs" />
     <Compile Include="AST\OperatorNode.cs" />
     <Compile Include="AST\RepeatNNode.cs" />
+    <Compile Include="AST\ReturnNode.cs" />
     <Compile Include="AST\ScopedNode.cs" />
     <Compile Include="AST\IASTNode.cs" />
     <Compile Include="AST\IBlockNode.cs" />
@@ -63,8 +65,11 @@
     <Compile Include="AST\PackageNode.cs" />
     <Compile Include="AST\RealConstantNode.cs" />
     <Compile Include="AST\StringConstantNode.cs" />
+    <Compile Include="AST\FunctionDeclarationNode.cs" />
+    <Compile Include="AST\Utils\FunctionCallNode.cs" />
     <Compile Include="AST\VariableDeclarationNode.cs" />
     <Compile Include="AST\VariableNode.cs" />
+    <Compile Include="AST\VoidExpressionNode.cs" />
     <Compile Include="AST\WhileNode.cs" />
     <Compile Include="Counters\FunctionalStringCounter.cs" />
     <Compile Include="Counters\ICounter.cs" />
@@ -73,6 +78,9 @@
     <Compile Include="Definitions\AbstractSymbol.cs" />
     <Compile Include="Definitions\DataType.cs" />
     <Compile Include="Definitions\Function.cs" />
+    <Compile Include="Definitions\Functions\BuiltInFunction.cs" />
+    <Compile Include="Definitions\Functions\SyscallFunction.cs" />
+    <Compile Include="Definitions\Functions\UserDefinedFunction.cs" />
     <Compile Include="Definitions\ISymbol.cs" />
     <Compile Include="Definitions\Operator.cs" />
     <Compile Include="Definitions\SymbolInitializationException.cs" />

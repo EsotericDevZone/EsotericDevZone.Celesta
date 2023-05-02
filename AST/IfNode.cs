@@ -24,7 +24,7 @@ namespace EsotericDevZone.Celesta.AST
             result += ThenBranch.ToString().Indent("    ") + "\n";
             if (ElseBranch != null) 
             {
-                result += "else";
+                result += "else\n";
                 result += ElseBranch.ToString().Indent("    ") + "\n";
             }
             result += "endif";

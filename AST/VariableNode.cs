@@ -2,11 +2,11 @@
 
 namespace EsotericDevZone.Celesta.AST
 {
-    internal class VariableNode : AbstractExpressionNode
+    public class VariableNode : AbstractExpressionNode
     {
         public Variable Variable { get; }
 
-        public VariableNode(IASTNode parent, Variable variable) : base(parent, variable.DataType)
+        internal VariableNode(IASTNode parent, Variable variable) : base(parent, variable.DataType)
         {
             Variable = variable;
         }

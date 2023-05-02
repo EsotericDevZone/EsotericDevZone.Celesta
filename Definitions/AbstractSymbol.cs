@@ -14,7 +14,7 @@
             ScopeName = scope;
         }
 
-        public override string ToString() => $"{PackageName}.{Name}@{ScopeName}";
+        public override string ToString() => $"{PackageName}.{Name}{ScopeName}";
     }
 
 }

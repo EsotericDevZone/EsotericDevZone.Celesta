@@ -41,7 +41,9 @@ namespace EsotericDevZone.Celesta.Providers
         ///     the bottom most symbol in the scope tree is returned
         /// </param>
         /// <returns>symbol definition which fits the requirements, or null if no such symbol exists</returns>
-        T Resolve(Identifier identifier, string scope, bool strict);        
+        T Resolve(Identifier identifier, string scope, bool strict);
+
+        T Resolve(Func<T, bool> predicate, bool strict);        
     }
 
     public interface IDataTypeProvider : ISymbolProvider<DataType> { }
@@ -52,6 +54,7 @@ namespace EsotericDevZone.Celesta.Providers
         IEnumerable<Function> Find(string name, string scope, DataType[] argTypes, DataType outputType);
         IEnumerable<Function> Find(string package, string name, string scope, DataType[] argTypes);
         IEnumerable<Function> Find(string package, string name, string scope, DataType[] argTypes, DataType outputType);
+        Function Resolve(Identifier identifier, string scope, DataType[] argTypes, bool strict);
     }
 
     public interface IOperatorProvider : ISymbolProvider<Operator>

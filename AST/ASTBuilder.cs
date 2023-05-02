@@ -1,11 +1,13 @@
 ﻿using EsotericDevZone.Celesta.AST.Utils;
 using EsotericDevZone.Celesta.Counters;
 using EsotericDevZone.Celesta.Definitions;
+using EsotericDevZone.Celesta.Definitions.Functions;
 using EsotericDevZone.Celesta.Parser.ParseTree;
 using EsotericDevZone.Celesta.Providers;
 using EsotericDevZone.Core;
 using EsotericDevZone.Core.Collections;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace EsotericDevZone.Celesta.AST
@@ -24,9 +26,13 @@ namespace EsotericDevZone.Celesta.AST
             dtprov.Add(Int);
             dtprov.Add(DataType.Primitive("decimal", "", "@main"));
             dtprov.Add(DataType.Primitive("string", "", "@main"));
+            dtprov.Add(DataType.Primitive("void", "", "@main"));
 
             opprov.Add(Operator.BinaryOperator("+", Int, Int, Int));
             opprov.Add(Operator.BinaryOperator("-", Int, Int, Int));
+            opprov.Add(Operator.BinaryOperator("<", Int, Int, Int));
+            opprov.Add(Operator.BinaryOperator(">", Int, Int, Int));
+            opprov.Add(Operator.BinaryOperator("==", Int, Int, Int));
             opprov.Add(Operator.UnaryOperator("-", Int, Int));
 
             var typeDefaults = new DataTypeDefaultValueGetter();
@@ -37,6 +43,7 @@ namespace EsotericDevZone.Celesta.AST
             astb.IntegerConstantType = dtprov.Find("int", "@main").First();
             astb.RealConstantType = dtprov.Find("decimal", "@main").First();
             astb.StringConstantType = dtprov.Find("string", "@main").First();
+            astb.VoidType = dtprov.Find("void", "@main").First();
 
             return astb;
         }
@@ -44,6 +51,7 @@ namespace EsotericDevZone.Celesta.AST
         public DataType IntegerConstantType { get; internal set; }
         public DataType RealConstantType { get; internal set; }
         public DataType StringConstantType { get; internal set; }
+        public DataType VoidType { get; internal set; }
         public IDataTypeDefaultValueGetter DataTypeDefaultValues { get; internal set; }
 
 
@@ -118,7 +126,7 @@ namespace EsotericDevZone.Celesta.AST
             if (parseTreeNode is StringLiteral stringLiteral)
             {
                 var strValue = stringLiteral.Value.Substring(1, stringLiteral.Value.Length - 2);
-                Console.WriteLine("Val = " + strValue);
+                //Console.WriteLine("Val = " + strValue);
                 var node = new StringConstantNode(parent, strValue.FromLiteral(), StringConstantType);
                 return BuildNodeResult.Node(node);
             }            
@@ -127,6 +135,22 @@ namespace EsotericDevZone.Celesta.AST
                 var varName = varDeclaraction.VariableName;
                 var typeIdentifier = varDeclaraction.DataType;
                 var scope = AbstractASTNode.GetScope(parent);
+
+                if (parent?.IsIncludedIn(typeof(FunctionDeclarationNode)) ?? false) 
+                {
+                    var funDecl = parent.GetClosestParent<FunctionDeclarationNode>();
+                    var function = funDecl.Function;
+                    if (function is UserDefinedFunction udf)
+                    {
+                        var formalParams = udf.FormalParameters;
+
+                        var param = udf.FormalParameters.Where(p => p.Name == varName).FirstOrDefault();
+                        if (param != null)
+                        {
+                            return BuildNodeResult.Error($"Declared variable has the same name with formal parameter '{param.Name}'");
+                        }
+                    }
+                }
 
                 var dataType = dataTypeProv.Resolve(typeIdentifier, scope, false);
                 if (dataType == null)
@@ -172,7 +196,26 @@ namespace EsotericDevZone.Celesta.AST
                 return BuildNodeResult.Node(node);
             }
             if(parseTreeNode is Identifier identifier)
-            {
+            {                
+                if (identifier.PackageName == "")
+                {
+                    if (parent?.IsIncludedIn(typeof(FunctionDeclarationNode)) ?? false) 
+                    {                        
+                        var funDecl = parent.GetClosestParent<FunctionDeclarationNode>();
+                        var function = funDecl.Function;                        
+                        if (function is UserDefinedFunction udf) 
+                        {                            
+                            var formalParams = udf.FormalParameters;
+
+                            var param = udf.FormalParameters.Where(p => p.Name == identifier.Name).FirstOrDefault();
+                            if(param!=null)
+                            {                                
+                                return BuildNodeResult.Node(new FunctionFormalParameterNode(parent, param));
+                            }
+                        }
+                    }
+                }
+
                 var scope = AbstractASTNode.GetScope(parent);                
                 var variable = variableProv.Resolve(identifier, scope, false);
                 if(variable==null)
@@ -313,9 +356,101 @@ namespace EsotericDevZone.Celesta.AST
                 reptNode.LoopLogic = loopLogic.ASTNode;
                 return BuildNodeResult.Node(reptNode);
             }
+            if (parseTreeNode is FunctionDeclaration fdecl) 
+            {                
+                var package = AbstractASTNode.GetPackage(parent);
+                var scope = AbstractASTNode.GetScope(parent);
+
+                var declArgs = fdecl.Arguments;
+                var declOut = fdecl.DataType;
+
+                List<DataType> argTypes = new List<DataType>();
+
+                foreach(var arg in declArgs)
+                {
+                    var dt = dataTypeProv.Resolve(arg.DataType, scope, false);
+                    if(dt==null)
+                        return BuildNodeResult.Error($"Unknown type : {arg.DataType}");                    
+                    argTypes.Add(dt);
+                }
+
+
+                var outDataType = dataTypeProv.Resolve(declOut, scope, false);
+
+                if (outDataType == null)
+                    return BuildNodeResult.Error($"Unknown type : {outDataType}");
+
+                var udf = new UserDefinedFunction(fdecl.Name, package, scope, argTypes.ToArray(), outDataType);
+                udf.FormalParameters = declArgs
+                    .Select((d, i) => (d, i))
+                    .Zip(argTypes, (di, t) => new FunctionFormalParameter(di.d.Name, t, di.i))
+                    .ToArray();
+                if (udf.FormalParameters.Length != udf.FormalParameters.Select(_ => _.Name).Distinct().Count())
+                    return BuildNodeResult.Error("Formal parameters with duplicate names are not allowed");
+
+                var udfNode = new FunctionDeclarationNode(parent) { Function = udf };                
+
+                var body = BuildNodeRec(fdecl.Body, dataTypeProv, variableProv, functionProv, operatorProv, udfNode);
+                if (body.Failed) return body;
+                
+                udfNode.Body = body.ASTNode;
+                udf.Body = body.ASTNode;
+
+                functionProv.Add(udf);
+                return BuildNodeResult.Node(udfNode);
+            }
+            if(parseTreeNode is Return ret)
+            {
+                var retNode = new ReturnNode(parent);
+                if (ret.Expression == null)
+                {                    
+                    retNode.ReturnedExpression = new VoidExpressionNode(retNode, VoidType);
+                    return BuildNodeResult.Node(retNode);
+                }
+                else
+                {
+                    var exprNode = BuildNodeRec(ret.Expression, dataTypeProv, variableProv, functionProv, operatorProv, retNode);
+                    exprNode = ExpectExpression(exprNode, out var exprNodeExpr);
+                    if (exprNode.Failed) return exprNode;
+                    retNode.ReturnedExpression = exprNodeExpr;
+                    return BuildNodeResult.Node(retNode);
+                }
+            }
             if(parseTreeNode is FunctionCall funcall)
             {
+                var funcallNode = new FunctionCallNode(parent);
+                var functor = funcall.Function;
+                var args = funcall.Arguments;
+                var scope = AbstractASTNode.GetScope(parent);
 
+                var argNodes = new List<IExpressionNode>();
+                foreach(var arg in args)
+                {
+                    var argNode = BuildNodeRec(arg, dataTypeProv, variableProv, functionProv, operatorProv, funcallNode);
+                    argNode = ExpectExpression(argNode, out var argNodeExpr);
+                    if (argNode.Failed) return argNode;
+                    argNodes.Add(argNodeExpr);
+                }
+
+                var argTypes = argNodes.Select(_ => _.OutputType).ToArray();
+
+                Function function = null;
+                if (functor is Identifier funIdentifier)
+                {
+                    function = functionProv.Resolve(funIdentifier, scope, argTypes, strict: false);
+                    if (function == null)
+                        return BuildNodeResult.Error($"No function defined: {funIdentifier.FullName}({argTypes.JoinToString(",")})");                    
+                }
+                else return BuildNodeResult.Error("Non-identifier functions are work in progress...");
+                
+                if(function==null)
+                {
+                    return BuildNodeResult.Error($"No function named: {funIdentifier.FullName}");
+                }
+
+                funcallNode.Function = function;
+                funcallNode.Arguments = argNodes.ToArray();
+                return BuildNodeResult.Node(funcallNode);
             }
 
 

@@ -27,8 +27,7 @@ namespace EsotericDevZone.Celesta.Parser.ParseTree
                 str += ThenBranch.ToString().Indent("    ") + "\n";
                 if (ElseBranch != null)
                 {
-                    str += "else\n";                    
-                    str += ElseBranch.ToString().Indent("    ") + "\n";
+                    str += $"else\n{ElseBranch.ToString().Indent("    ")}\n";                    
                 }
             }
             str += "endif";

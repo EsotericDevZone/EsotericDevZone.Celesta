@@ -2,7 +2,7 @@
 
 namespace EsotericDevZone.Celesta.Definitions
 {
-    public class Function : AbstractSymbol
+    public abstract class Function : AbstractSymbol
     {
         public Function(string name, string package, string scope, DataType[] argumentTypes, DataType outputType) 
             : base(name, package, scope)
