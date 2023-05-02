@@ -57,6 +57,7 @@
     <Compile Include="AST\OperatorNode.cs" />
     <Compile Include="AST\RepeatNNode.cs" />
     <Compile Include="AST\ReturnNode.cs" />
+    <Compile Include="AST\ReturnTypeMismatchException.cs" />
     <Compile Include="AST\ScopedNode.cs" />
     <Compile Include="AST\IASTNode.cs" />
     <Compile Include="AST\IBlockNode.cs" />
@@ -66,7 +67,7 @@
     <Compile Include="AST\RealConstantNode.cs" />
     <Compile Include="AST\StringConstantNode.cs" />
     <Compile Include="AST\FunctionDeclarationNode.cs" />
-    <Compile Include="AST\Utils\FunctionCallNode.cs" />
+    <Compile Include="AST\FunctionCallNode.cs" />
     <Compile Include="AST\VariableDeclarationNode.cs" />
     <Compile Include="AST\VariableNode.cs" />
     <Compile Include="AST\VoidExpressionNode.cs" />
@@ -129,10 +130,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CoreShadow\CoreShadow.csproj">
-      <Project>{1b918478-7cb1-40a6-a679-6cde14fbb34b}</Project>
-      <Name>CoreShadow</Name>
-    </ProjectReference>
     <ProjectReference Include="..\EsotericDevZone.Core\EsotericDevZone.Core.csproj">
       <Project>{3897bd01-4139-4f16-b86c-ffb1d66bcba0}</Project>
       <Name>EsotericDevZone.Core</Name>

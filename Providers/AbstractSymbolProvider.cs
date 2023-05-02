@@ -18,7 +18,7 @@ namespace EsotericDevZone.Celesta.Providers
 
         public IEnumerable<T> Find(string package, string name, string scope)
         {
-            return Symbols.Where(s => s.Name == name && scope.StartsWith(s.ScopeName)
+            return Symbols.Where(s => s.Name == name && (s.ScopeName==null || scope.StartsWith(s.ScopeName))
                 && s.PackageName == package);
         }
 

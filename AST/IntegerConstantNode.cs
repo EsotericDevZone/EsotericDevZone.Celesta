@@ -2,7 +2,7 @@
 
 namespace EsotericDevZone.Celesta.AST
 {
-    internal class IntegerConstantNode : AbstractExpressionNode
+    public class IntegerConstantNode : AbstractExpressionNode
     {
         public int Value { get; }
 

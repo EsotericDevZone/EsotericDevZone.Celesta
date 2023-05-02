@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EsotericDevZone.Celesta.AST.Utils
+namespace EsotericDevZone.Celesta.AST
 {
     public class FunctionCallNode : AbstractASTNode, IExpressionNode
     {

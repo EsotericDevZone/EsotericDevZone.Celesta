@@ -20,13 +20,19 @@ namespace EsotericDevZone.Celesta.AST
             var vbprov = new VariableProvider();
             var fnprov = new FunctionProvider();
             var opprov = new OperatorProvider();
+            
 
-            var Int = DataType.Primitive("int", "", "@main");            
+            var Int = DataType.Primitive("int", "", "@main");
+            var Decimal = DataType.Primitive("decimal", "", "@main");
+            var String = DataType.Primitive("string", "", "@main");
+            var Void = DataType.Primitive("void", "", "@main");
+
+            fnprov.Add(new BuiltInFunction("print", "", Arrays.Of(Int), Void));
 
             dtprov.Add(Int);
-            dtprov.Add(DataType.Primitive("decimal", "", "@main"));
-            dtprov.Add(DataType.Primitive("string", "", "@main"));
-            dtprov.Add(DataType.Primitive("void", "", "@main"));
+            dtprov.Add(Decimal);
+            dtprov.Add(String);
+            dtprov.Add(Void);
 
             opprov.Add(Operator.BinaryOperator("+", Int, Int, Int));
             opprov.Add(Operator.BinaryOperator("-", Int, Int, Int));
@@ -93,6 +99,8 @@ namespace EsotericDevZone.Celesta.AST
             {
                 throw new ASTBuildNodeException(buildResult.ErrorMessage);
             }
+
+            ValidateAST(buildResult.ASTNode);
 
             DataTypeProvider.CopyFromProvider(tempDataTypeProv);
             VariableProvider.CopyFromProvider(tempVariableProv);
@@ -442,8 +450,8 @@ namespace EsotericDevZone.Celesta.AST
                         return BuildNodeResult.Error($"No function defined: {funIdentifier.FullName}({argTypes.JoinToString(",")})");                    
                 }
                 else return BuildNodeResult.Error("Non-identifier functions are work in progress...");
-                
-                if(function==null)
+
+                if (function == null) 
                 {
                     return BuildNodeResult.Error($"No function named: {funIdentifier.FullName}");
                 }
@@ -473,6 +481,16 @@ namespace EsotericDevZone.Celesta.AST
 
         }*/
 
+        private void ValidateAST(IASTNode ast)
+        {
+            AbstractASTNode.AssertAllNonNestedInType<FunctionDeclarationNode, ReturnNode>(ast,
+                (fundecl, ret) => ret.OutputType == fundecl.OutputType,
+                (fundecl, ret) => throw new ReturnTypeMismatchException(
+                    $"Wrong return type '{ret.OutputType}' in function '{fundecl.Function.FullName}' which returns '{fundecl.OutputType}'")
+                );
+            //AbstractASTNode.AssertAllNonNestedInTheSameType<>
+        }
+
         class BuildNodeResult
         {
             public IASTNode ASTNode { get; }
@@ -488,7 +506,5 @@ namespace EsotericDevZone.Celesta.AST
             public static BuildNodeResult Node(IASTNode node) => new BuildNodeResult(node, null);
             public static BuildNodeResult Error(string message) => new BuildNodeResult(null, message);
         }
-
-
     }
 }
