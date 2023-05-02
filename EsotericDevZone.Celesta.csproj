@@ -52,7 +52,9 @@
     <Compile Include="AST\AssignmentNode.cs" />
     <Compile Include="AST\ASTBuilder.cs" />
     <Compile Include="AST\ASTBuildNodeException.cs" />
+    <Compile Include="AST\IfNode.cs" />
     <Compile Include="AST\OperatorNode.cs" />
+    <Compile Include="AST\RepeatNNode.cs" />
     <Compile Include="AST\ScopedNode.cs" />
     <Compile Include="AST\IASTNode.cs" />
     <Compile Include="AST\IBlockNode.cs" />
@@ -63,6 +65,7 @@
     <Compile Include="AST\StringConstantNode.cs" />
     <Compile Include="AST\VariableDeclarationNode.cs" />
     <Compile Include="AST\VariableNode.cs" />
+    <Compile Include="AST\WhileNode.cs" />
     <Compile Include="Counters\FunctionalStringCounter.cs" />
     <Compile Include="Counters\ICounter.cs" />
     <Compile Include="Counters\IncrementCounter.cs" />
@@ -111,6 +114,8 @@
     <Compile Include="Providers\OperatorProvider.cs" />
     <Compile Include="Providers\VariableProvider.cs" />
     <Compile Include="Utils.cs" />
+    <Compile Include="AST\Utils\DataTypeDefaultValueGetter.cs" />
+    <Compile Include="AST\Utils\IDataTypeDefaultValueGetter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -1,13 +1,12 @@
-﻿using EsotericDevZone.Celesta.Counters;
+﻿using EsotericDevZone.Celesta.AST.Utils;
+using EsotericDevZone.Celesta.Counters;
 using EsotericDevZone.Celesta.Definitions;
 using EsotericDevZone.Celesta.Parser.ParseTree;
 using EsotericDevZone.Celesta.Providers;
 using EsotericDevZone.Core;
 using EsotericDevZone.Core.Collections;
-using EsotericDevZone.RuleBasedParser;
 using System;
 using System.Linq;
-using System.Xml.Linq;
 
 namespace EsotericDevZone.Celesta.AST
 {
@@ -30,7 +29,10 @@ namespace EsotericDevZone.Celesta.AST
             opprov.Add(Operator.BinaryOperator("-", Int, Int, Int));
             opprov.Add(Operator.UnaryOperator("-", Int, Int));
 
-            var astb = new ASTBuilder(dtprov, vbprov, fnprov, opprov);
+            var typeDefaults = new DataTypeDefaultValueGetter();
+            typeDefaults.SetDefaultValue(Int, () => new IntegerConstantNode(null, 0, Int));
+
+            var astb = new ASTBuilder(dtprov, vbprov, fnprov, opprov, typeDefaults);
 
             astb.IntegerConstantType = dtprov.Find("int", "@main").First();
             astb.RealConstantType = dtprov.Find("decimal", "@main").First();
@@ -42,6 +44,7 @@ namespace EsotericDevZone.Celesta.AST
         public DataType IntegerConstantType { get; internal set; }
         public DataType RealConstantType { get; internal set; }
         public DataType StringConstantType { get; internal set; }
+        public IDataTypeDefaultValueGetter DataTypeDefaultValues { get; internal set; }
 
 
         private IDataTypeProvider DataTypeProvider;
@@ -52,12 +55,13 @@ namespace EsotericDevZone.Celesta.AST
         private IStringCounter ScopeCounter = new FunctionalStringCounter(i => $"@_s{i}");
 
         public ASTBuilder(IDataTypeProvider dataTypeProvider, IVariableProvider variableProvider
-            , IFunctionProvider functionProvider, IOperatorProvider operatorProvider)
+            , IFunctionProvider functionProvider, IOperatorProvider operatorProvider, IDataTypeDefaultValueGetter defaultValues)
         {
             DataTypeProvider = dataTypeProvider;
             VariableProvider = variableProvider;
             FunctionProvider = functionProvider;
             OperatorProvider = operatorProvider;
+            DataTypeDefaultValues = defaultValues;
         }
 
         public IASTNode BuildNode(IParseTreeNode parseTreeNode)
@@ -142,8 +146,9 @@ namespace EsotericDevZone.Celesta.AST
                 var variableNode = new VariableNode(decl, variable);
                 decl.VariableNode = variableNode;
 
-                var assignedExpression = BuildNodeRec(varDeclaraction.InitializationValue
-                    , dataTypeProv, variableProv, functionProv, operatorProv, decl);
+                var assignedExpression = varDeclaraction.InitializationValue != null
+                    ? BuildNodeRec(varDeclaraction.InitializationValue, dataTypeProv, variableProv, functionProv, operatorProv, decl)
+                    : BuildNodeResult.Node(DataTypeDefaultValues.GetDefaultValue(dataType));
 
                 if (assignedExpression.Failed)
                     return assignedExpression;
@@ -249,8 +254,68 @@ namespace EsotericDevZone.Celesta.AST
                         return cresult;
                     packNode.AddChild(cresult.ASTNode);
                 }
-
                 return BuildNodeResult.Node(packNode);
+            }
+            if(parseTreeNode is IfBlock ifBlock)
+            {
+                var ifNode = new IfNode(parent);
+
+                var condition = BuildNodeRec(ifBlock.Condition, dataTypeProv, variableProv, functionProv, operatorProv, ifNode);
+                condition = ExpectExpression(condition, out var condExpr);
+                if (condition.Failed)
+                    return condition;
+
+                var thenBranch = BuildNodeRec(ifBlock.ThenBranch, dataTypeProv, variableProv, functionProv, operatorProv, ifNode);
+
+                if (thenBranch.Failed) return thenBranch;
+
+                var elseBranch = ifBlock.ElseBranch != null
+                    ? BuildNodeRec(ifBlock.ElseBranch, dataTypeProv, variableProv, functionProv, operatorProv, ifNode)
+                    : null;
+
+                if (elseBranch?.Failed ?? false) return elseBranch;
+
+                ifNode.Condition = condExpr;
+                ifNode.ThenBranch = thenBranch.ASTNode;
+                ifNode.ElseBranch = elseBranch?.ASTNode;
+
+                return BuildNodeResult.Node(ifNode);
+            }
+            if(parseTreeNode is WhileBlock whileBlock)
+            {
+                var whileNode = new WhileNode(parent);
+
+                var condition = BuildNodeRec(whileBlock.Condition, dataTypeProv, variableProv, functionProv, operatorProv, whileNode);
+                condition = ExpectExpression(condition, out var condExpr);
+                if (condition.Failed)
+                    return condition;
+
+                var loopLogic = BuildNodeRec(whileBlock.Loop, dataTypeProv, variableProv, functionProv, operatorProv, whileNode);
+                if (loopLogic.Failed) return loopLogic;
+
+                whileNode.Condition = condExpr;
+                whileNode.LoopLogic = loopLogic.ASTNode;
+                return BuildNodeResult.Node(whileNode);
+            }
+            if(parseTreeNode is RepeatNBlock reptN)
+            {
+                var reptNode = new RepeatNNode(parent);
+
+                var count = BuildNodeRec(reptN.Count, dataTypeProv, variableProv, functionProv, operatorProv, reptNode);
+                count = ExpectExpression(count, out var countExpr);
+                if (count.Failed)
+                    return count;
+
+                var loopLogic = BuildNodeRec(reptN.Loop, dataTypeProv, variableProv, functionProv, operatorProv, reptNode);
+                if (loopLogic.Failed) return loopLogic;
+
+                reptNode.Count = countExpr;
+                reptNode.LoopLogic = loopLogic.ASTNode;
+                return BuildNodeResult.Node(reptNode);
+            }
+            if(parseTreeNode is FunctionCall funcall)
+            {
+
             }
 
 
