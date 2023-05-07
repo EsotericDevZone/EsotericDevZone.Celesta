@@ -11,9 +11,15 @@ namespace EsotericDevZone.Celesta.Providers
     {
         List<T> Symbols = new List<T>();
 
+        public bool print<U>(U t)
+        {
+            Console.WriteLine(t);
+            return true;
+        }
+
         public IEnumerable<T> Find(string name, string scope)
         {
-            return Symbols.Where(s => s.Name == name && scope.StartsWith(s.ScopeName));
+            return Symbols.Where(s => s.Name == name && scope.StartsWith(s.ScopeName ?? ""));
         }
 
         public IEnumerable<T> Find(string package, string name, string scope)

@@ -94,7 +94,7 @@ namespace EsotericDevZone.Celesta.AST
             var buildResult = BuildNodeRec(parseTreeNode, tempDataTypeProv, tempVariableProv
                 , tempFunctionProv, tempOperatorProv, null);
 
-            if(buildResult.Failed)
+            if (buildResult.Failed) 
             {
                 throw new ASTBuildNodeException(buildResult.ErrorMessage);
             }
@@ -442,9 +442,9 @@ namespace EsotericDevZone.Celesta.AST
                 var argTypes = argNodes.Select(_ => _.OutputType).ToArray();
 
                 Function function = null;
-                if (functor is Identifier funIdentifier)
+                if (functor is Identifier funIdentifier) 
                 {
-                    function = functionProv.Resolve(funIdentifier, scope, argTypes, strict: true);
+                    function = functionProv.Resolve(funIdentifier, scope, argTypes, strict: true);                    
                     if (function == null)
                         return BuildNodeResult.Error($"No function defined: {funIdentifier.FullName}({argTypes.JoinToString(",")})");                    
                 }

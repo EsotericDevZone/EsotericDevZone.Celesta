@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using EsotericDevZone.Core;
+using System.Linq;
 
 namespace EsotericDevZone.Celesta.Definitions
 {
@@ -13,5 +14,7 @@ namespace EsotericDevZone.Celesta.Definitions
 
         public DataType[] ArgumentTypes { get; }
         public DataType OutputType { get; }
+
+        public override string ToString() => $"{base.ToString()}({ArgumentTypes.JoinToString(",")})->{OutputType}";
     }
 }

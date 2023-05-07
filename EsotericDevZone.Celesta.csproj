@@ -88,7 +88,9 @@
     <Compile Include="Definitions\SymbolInitializationException.cs" />
     <Compile Include="Definitions\Variable.cs" />
     <Compile Include="Extensions\SymbolExtensions.cs" />
+    <Compile Include="Interpreter\Implementations\FunctionImplementation.cs" />
     <Compile Include="Interpreter\Implementations\OperatorImplementation.cs" />
+    <Compile Include="Interpreter\LocalContext.cs" />
     <Compile Include="Interpreter\ValueObject.cs" />
     <Compile Include="Language.cs" />
     <Compile Include="Parser\LiteralException.cs" />

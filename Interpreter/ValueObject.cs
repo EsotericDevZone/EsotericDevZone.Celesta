@@ -12,5 +12,7 @@ namespace EsotericDevZone.Celesta.Interpreter
             DataType = dataType;
             Value = value;
         }
+
+        internal bool ScopeMustReturn { get; set; } = false;
     }
 }

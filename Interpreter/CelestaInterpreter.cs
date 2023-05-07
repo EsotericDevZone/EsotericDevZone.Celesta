@@ -13,6 +13,7 @@ using EsotericDevZone.Celesta.Parser;
 using EsotericDevZone.Celesta.Parser.ParseTree;
 using EsotericDevZone.RuleBasedParser;
 using EsotericDevZone.Celesta.Interpreter.Implementations;
+using EsotericDevZone.Core;
 
 namespace EsotericDevZone.Celesta.Interpreter
 {
@@ -31,19 +32,25 @@ namespace EsotericDevZone.Celesta.Interpreter
             var Decimal = DataType.Primitive("decimal", "", "@main");
             var String = DataType.Primitive("string", "", "@main");
             var Void = DataType.Primitive("void", "", "@main");
-
-            FunctionProvider.Add(new BuiltInFunction("print", "", Arrays.Of(Int), Void));
-
+            
             DataTypeProvider.Add(Int);
             DataTypeProvider.Add(Decimal);
             DataTypeProvider.Add(String);
             DataTypeProvider.Add(Void);
 
+            AddBuiltInFunction("print", Arrays.Of("string"), "void", args =>
+            {
+                Console.WriteLine(args[0].Value);
+                return new ValueObject(ASTBuilder.VoidType, null);
+            });
+
+            AddBuiltInFunction("str", Arrays.Of("int"), "string", args => new ValueObject(String, args[0].Value.ToString()));
+
             AddOperator("+", "int", "int", "int", (a, b) => new ValueObject(Int, (int)a.Value + (int)b.Value));
             AddOperator("-", "int", "int", "int", (a, b) => new ValueObject(Int, (int)a.Value - (int)b.Value));
             AddOperator("*", "int", "int", "int", (a, b) => new ValueObject(Int, (int)a.Value * (int)b.Value));
             AddOperator("/", "int", "int", "int", (a, b) => new ValueObject(Int, (int)a.Value / (int)b.Value));
-            
+
             /*OperatorProvider.Add(Operator.BinaryOperator("<", Int, Int, Int));
             OperatorProvider.Add(Operator.BinaryOperator(">", Int, Int, Int));
             OperatorProvider.Add(Operator.BinaryOperator("==", Int, Int, Int));
@@ -62,6 +69,7 @@ namespace EsotericDevZone.Celesta.Interpreter
         }
 
         private Dictionary<Operator, OperatorImplementation> OperatorImplementations = new Dictionary<Operator, OperatorImplementation>();
+        private Dictionary<Function, FunctionImplementation> FunctionImplementations = new Dictionary<Function, FunctionImplementation>();
 
         private DataType GetTypeByFullName(string name)
         {
@@ -69,6 +77,21 @@ namespace EsotericDevZone.Celesta.Interpreter
             if (identifier == null)
                 throw new ArgumentException("Input is not a valid identifier name");
             return DataTypeProvider.Resolve(identifier, "@main", true);
+        }
+
+        public void AddBuiltInFunction(string funName, string[] argTypes, string outType, Func<ValueObject[], ValueObject> func)
+        {
+            var inT = argTypes.Select(GetTypeByFullName).ToArray();
+            var outT = GetTypeByFullName(outType);
+            var idt = funName.ToIdentifier();
+            if(FunctionProvider.Resolve(idt, "@main",inT, false)!=null)
+            {
+                throw new ArgumentException($"Function already exists: {funName}({inT.JoinToString(",")})");
+            }
+            var fun = new BuiltInFunction(idt.Name, idt.PackageName, inT, outT);
+            FunctionProvider.Add(fun);
+            var impl = new FunctionImplementation(fun, func);
+            FunctionImplementations[fun] = impl;
         }
 
         public void AddOperator(string opName, string in1Type, string in2Type, string outType, Func<ValueObject, ValueObject, ValueObject> func)
@@ -98,7 +121,7 @@ namespace EsotericDevZone.Celesta.Interpreter
             return Variables[variable.Variable.FullName];
         }
 
-        private ValueObject Execute(IASTNode node)
+        private ValueObject Execute(IASTNode node, LocalContext localContext)
         {
             if(node is IntegerConstantNode constInt)
             {
@@ -116,14 +139,18 @@ namespace EsotericDevZone.Celesta.Interpreter
             if(node is IBlockNode blockNode)
             {
                 foreach (var child in blockNode.GetChildren())
-                    Execute(child);
+                {
+                    var eval = Execute(child, localContext);
+                    if (eval.ScopeMustReturn)
+                        return eval;                    
+                }
                 return new ValueObject(ASTBuilder.VoidType, null);
             }
             if (node is VariableDeclarationNode vdecl) 
             {
                 var variable = vdecl.VariableNode;
                 var expression = vdecl.AssignedExpression;
-                var value = Execute(expression);
+                var value = Execute(expression, localContext);
                 SetVariableValue(variable, value);
                 return value;
             }
@@ -134,12 +161,71 @@ namespace EsotericDevZone.Celesta.Interpreter
             if(node is OperatorNode op)
             {
                 var oper = op.Operator;
-                var impl = OperatorImplementations[oper];
-                ValueObject result = impl.Operation(op.Arguments.Select(Execute).ToArray());
-                if (result.DataType.FullName != oper.OutputType.FullName)
-                    throw new InvalidOperationException("Operator returned a different type than expected");
+                try
+                {                    
+                    var impl = OperatorImplementations[oper];
+                    ValueObject result = impl.Operation(op.Arguments.Select(_ => Execute(_, localContext)).ToArray());
+                    if (result.DataType.FullName != oper.OutputType.FullName)
+                        throw new InvalidOperationException("Operator returned a different type than expected");
+                    return result;
+                }
+                catch(KeyNotFoundException)
+                {
+                    throw new ArgumentException($"No implementation found for operator {oper}");
+                }
+            }
+            if(node is FunctionFormalParameterNode formalParam)
+            {
+                if (localContext == null)
+                    throw new ArgumentException("DEBUG FATAL : Function local context expected");
+                return localContext.FormalParameters[formalParam.Name];
+            }
+            if(node is FunctionDeclarationNode fdecl)
+            {
+                var fun = fdecl.Function;
+                if (FunctionImplementations.ContainsKey(fun))
+                    throw new ArgumentException($"Function implementation already defined : {fun}");
+
+                FunctionImplementations[fun] = new FunctionImplementation(fun, args =>
+                {
+                    var context = new LocalContext(localContext);
+                    var udf = (fdecl.Function as UserDefinedFunction);
+                    for (int i=0;i<udf.FormalParameters.Length;i++)
+                    {
+                        context.FormalParameters[udf.FormalParameters[i].Name] = args[i];
+                    }
+                    var result = Execute(fdecl.Body, context);
+                    result.ScopeMustReturn = false;
+                    return result;
+                });
+
+
+                return new ValueObject(ASTBuilder.VoidType, null);
+            }
+            if (node is FunctionCallNode funcall) 
+            {
+                try
+                {
+                    var f = FunctionImplementations[funcall.Function];
+                    var result = f.Operation(funcall.Arguments.Select(_=>Execute(_,localContext)).ToArray());
+                    if (result.DataType.FullName != funcall.OutputType.FullName)
+                        throw new InvalidOperationException("Function returned a different type than expected");
+                    return result;
+                }
+                catch(KeyNotFoundException)
+                {
+                    throw new ArgumentException($"No implementation found for function : {funcall.Function}");
+                }
+            }            
+            if(node is ReturnNode ret)
+            {
+                if (ret.OutputType.FullName == ASTBuilder.VoidType.FullName)
+                    return new ValueObject(ASTBuilder.VoidType, null) { ScopeMustReturn = true };
+                var result = Execute(ret.ReturnedExpression, localContext);
+                result.ScopeMustReturn = true;
                 return result;
             }
+
 
             throw new ArgumentException($"Node not implemented : {node.GetType()}");            
         }
@@ -148,7 +234,7 @@ namespace EsotericDevZone.Celesta.Interpreter
         {
             var _node = Parser.Parse<IParseTreeNode>(input);
             var _ast = ASTBuilder.BuildNode(_node);
-            return Execute(_ast).Value;
+            return Execute(_ast, null).Value;
         }
     }
 }
