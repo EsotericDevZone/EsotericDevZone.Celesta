@@ -53,11 +53,19 @@ namespace EsotericDevZone.Celesta.Interpreter
             AddOperator("-", "int", "int", "int", (a, b) => new ValueObject(Int, (int)a.Value - (int)b.Value));
             AddOperator("*", "int", "int", "int", (a, b) => new ValueObject(Int, (int)a.Value * (int)b.Value));
             AddOperator("/", "int", "int", "int", (a, b) => new ValueObject(Int, (int)a.Value / (int)b.Value));
+            AddOperator("%", "int", "int", "int", (a, b) => new ValueObject(Int, (int)a.Value % (int)b.Value));
 
-            /*OperatorProvider.Add(Operator.BinaryOperator("<", Int, Int, Int));
-            OperatorProvider.Add(Operator.BinaryOperator(">", Int, Int, Int));
-            OperatorProvider.Add(Operator.BinaryOperator("==", Int, Int, Int));
-            OperatorProvider.Add(Operator.UnaryOperator("-", Int, Int));*/
+            AddOperator("==", "int", "int", "bool", (a, b) => new ValueObject(Bool, (int)a.Value == (int)b.Value));
+            AddOperator("!=", "int", "int", "bool", (a, b) => new ValueObject(Bool, (int)a.Value != (int)b.Value));
+            AddOperator("<", "int", "int", "bool", (a, b) => new ValueObject(Bool, (int)a.Value < (int)b.Value));
+            AddOperator("<=", "int", "int", "bool", (a, b) => new ValueObject(Bool, (int)a.Value <= (int)b.Value));
+            AddOperator(">", "int", "int", "bool", (a, b) => new ValueObject(Bool, (int)a.Value > (int)b.Value));
+            AddOperator(">=", "int", "int", "bool", (a, b) => new ValueObject(Bool, (int)a.Value >= (int)b.Value));
+
+            AddOperator("+", "int", "int", (a) => new ValueObject(Int, (int)a.Value));
+            AddOperator("-", "int", "int", (a) => new ValueObject(Int, -(int)a.Value));
+
+            AddOperator("+", "string", "string", "string", (a, b) => new ValueObject(String, (string)a.Value + (string)b.Value));
 
             var typeDefaults = new DataTypeDefaultValueGetter();
             typeDefaults.SetDefaultValue(Int, () => new IntegerConstantNode(null, 0, Int));
@@ -108,6 +116,18 @@ namespace EsotericDevZone.Celesta.Interpreter
                 throw new ArgumentException($"Operator already exists: {opName}({in1T},{in2T})");
             var op = Operator.BinaryOperator(opName, in1T, in2T, outT);
             var impl = new OperatorImplementation(op, args => func(args[0], args[1]));
+            OperatorProvider.Add(op);
+            OperatorImplementations[op] = impl;
+        }
+
+        public void AddOperator(string opName, string in1Type, string outType, Func<ValueObject, ValueObject> func)
+        {
+            var in1T = GetTypeByFullName(in1Type);            
+            var outT = GetTypeByFullName(outType);
+            if (OperatorProvider.FindUnary(opName, in1T).Count() > 0) 
+                throw new ArgumentException($"Operator already exists: {opName}({in1T})");
+            var op = Operator.UnaryOperator(opName, in1T, outT);
+            var impl = new OperatorImplementation(op, args => func(args[0]));
             OperatorProvider.Add(op);
             OperatorImplementations[op] = impl;
         }
@@ -234,7 +254,55 @@ namespace EsotericDevZone.Celesta.Interpreter
                 result.ScopeMustReturn = true;
                 return result;
             }
+            if(node is IfNode ifNode)
+            {
+                var condition = Execute(ifNode.Condition, localContext);
+                if((bool)condition.Value)
+                {
+                    var value = Execute(ifNode.ThenBranch, localContext);
+                    if (value.ScopeMustReturn)
+                        return value;
+                }
+                else if(ifNode.ElseBranch!=null)
+                {
+                    var value = Execute(ifNode.ElseBranch, localContext);
+                    if (value.ScopeMustReturn)
+                        return value;
+                }
+                return new ValueObject(ASTBuilder.VoidType, null);
+            }
+            if(node is WhileNode whileNode)
+            {
+                while((bool)Execute(whileNode.Condition, localContext).Value)
+                {
+                    var value = Execute(whileNode.LoopLogic, localContext);
+                    if (value.ScopeMustReturn)
+                        return value;
+                }
+                return new ValueObject(ASTBuilder.VoidType, null);
+            }
+            if(node is AssignmentNode assign)
+            {
+                var lhs = assign.LeftHandSide;
+                var rhs = assign.RightHandSide;
 
+                if (lhs is VariableNode variable)
+                {
+                    var value = Execute(rhs, localContext);
+                    SetVariableValue(variable, value);
+                    return new ValueObject(ASTBuilder.VoidType, null);
+                }
+                else if (lhs is FunctionFormalParameterNode fParam) 
+                {
+                    var value = Execute(rhs, localContext);
+                    localContext.FormalParameters[fParam.Name] = value;
+                    return new ValueObject(ASTBuilder.VoidType, null);
+                }
+                else
+                {
+                    throw new NotImplementedException("Invalid left-hand-side in assignment");
+                }
+            }
 
             throw new ArgumentException($"Node not implemented : {node.GetType()}");            
         }

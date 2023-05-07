@@ -221,7 +221,7 @@ namespace EsotericDevZone.Celesta.AST
                 if (identifier.PackageName == "")
                 {
                     if (parent?.IsIncludedIn(typeof(FunctionDeclarationNode)) ?? false) 
-                    {                        
+                    {
                         var funDecl = parent.GetClosestParent<FunctionDeclarationNode>();
                         var function = funDecl.Function;                        
                         if (function is UserDefinedFunction udf) 
@@ -501,6 +501,9 @@ namespace EsotericDevZone.Celesta.AST
                 (fundecl, ret) => throw new ReturnTypeMismatchException(
                     $"Wrong return type '{ret.OutputType}' in function '{fundecl.Function.FullName}' which returns '{fundecl.OutputType}'")
                 );
+
+            AbstractASTNode.AssertAllNodes<IfNode>(ast, node => node.Condition.OutputType == BooleanConstantType,
+                nd => throw new ArgumentException("If conditional must be a boolean expression"));
             //AbstractASTNode.AssertAllNonNestedInTheSameType<>
         }
 
