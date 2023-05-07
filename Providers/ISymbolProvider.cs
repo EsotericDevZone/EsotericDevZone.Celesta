@@ -41,7 +41,7 @@ namespace EsotericDevZone.Celesta.Providers
         ///     the bottom most symbol in the scope tree is returned
         /// </param>
         /// <returns>symbol definition which fits the requirements, or null if no such symbol exists</returns>
-        T Resolve(Identifier identifier, string scope, bool strict);
+        T Resolve(Identifier identifier, string scope, bool strict);        
 
         T Resolve(Func<T, bool> predicate, bool strict);        
     }

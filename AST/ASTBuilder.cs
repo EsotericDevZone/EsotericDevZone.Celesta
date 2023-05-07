@@ -19,8 +19,7 @@ namespace EsotericDevZone.Celesta.AST
             var dtprov = new DataTypeProvider();
             var vbprov = new VariableProvider();
             var fnprov = new FunctionProvider();
-            var opprov = new OperatorProvider();
-            
+            var opprov = new OperatorProvider();            
 
             var Int = DataType.Primitive("int", "", "@main");
             var Decimal = DataType.Primitive("decimal", "", "@main");
@@ -166,8 +165,8 @@ namespace EsotericDevZone.Celesta.AST
 
                 var package = AbstractASTNode.GetPackage(parent);
 
-                if(variableProv.Find(package, varName, scope).Count()>0)
-                {
+                if (variableProv.Find(package, varName, scope).Count() > 0) 
+                {                    
                     return BuildNodeResult.Error($"Duplicate variable definition : {varName}");
                 }
 
@@ -222,7 +221,7 @@ namespace EsotericDevZone.Celesta.AST
                             }
                         }
                     }
-                }
+                }                
 
                 var scope = AbstractASTNode.GetScope(parent);                
                 var variable = variableProv.Resolve(identifier, scope, false);
@@ -416,8 +415,8 @@ namespace EsotericDevZone.Celesta.AST
                     return BuildNodeResult.Node(retNode);
                 }
                 else
-                {
-                    var exprNode = BuildNodeRec(ret.Expression, dataTypeProv, variableProv, functionProv, operatorProv, retNode);
+                {                    
+                    var exprNode = BuildNodeRec(ret.Expression, dataTypeProv, variableProv, functionProv, operatorProv, retNode);                    
                     exprNode = ExpectExpression(exprNode, out var exprNodeExpr);
                     if (exprNode.Failed) return exprNode;
                     retNode.ReturnedExpression = exprNodeExpr;
@@ -445,7 +444,7 @@ namespace EsotericDevZone.Celesta.AST
                 Function function = null;
                 if (functor is Identifier funIdentifier)
                 {
-                    function = functionProv.Resolve(funIdentifier, scope, argTypes, strict: false);
+                    function = functionProv.Resolve(funIdentifier, scope, argTypes, strict: true);
                     if (function == null)
                         return BuildNodeResult.Error($"No function defined: {funIdentifier.FullName}({argTypes.JoinToString(",")})");                    
                 }

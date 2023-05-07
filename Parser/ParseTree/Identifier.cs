@@ -7,6 +7,12 @@ namespace EsotericDevZone.Celesta.Parser.ParseTree
         public string PackageName { get; }
         public string Name { get; }
 
+        internal Identifier(string packageName, string name)
+        {
+            PackageName = packageName;
+            Name = name;
+        }
+
         internal Identifier(string[] symbols)
         {
             PackageName = string.Join("#", symbols.Take(symbols.Length - 1));

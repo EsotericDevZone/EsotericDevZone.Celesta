@@ -33,7 +33,11 @@ namespace EsotericDevZone.Celesta.Providers
 
         public Function Resolve(Identifier identifier, string scope, DataType[] argTypes, bool strict)
         {
-            var candidates = Find(identifier.PackageName, identifier.Name, scope, argTypes).ToArray();
+            Function[] candidates;
+            if (identifier.PackageName == "")
+                candidates = Find(identifier.Name, scope, argTypes).ToArray();
+            else
+                candidates = Find(identifier.PackageName, identifier.Name, scope, argTypes).ToArray();
             if (candidates.Length == 0)
                 return null;
             if (strict && candidates.Length > 1)

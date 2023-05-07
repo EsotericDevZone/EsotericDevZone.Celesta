@@ -50,7 +50,13 @@ namespace EsotericDevZone.Celesta.Providers
 
         public T Resolve(Identifier identifier, string scope, bool strict)
         {
-            var candidates = Find(identifier, scope).ToArray();
+            T[] candidates;            
+            if (identifier.PackageName == "") 
+            {                
+                candidates = Find(identifier.Name, scope).ToArray();
+            }
+            else
+                candidates = Find(identifier, scope).ToArray();
             if (candidates.Length == 0)
                 return null;
             if (strict && candidates.Length > 1)

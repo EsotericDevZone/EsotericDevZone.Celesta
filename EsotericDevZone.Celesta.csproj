@@ -72,6 +72,7 @@
     <Compile Include="AST\VariableNode.cs" />
     <Compile Include="AST\VoidExpressionNode.cs" />
     <Compile Include="AST\WhileNode.cs" />
+    <Compile Include="Interpreter\CelestaInterpreter.cs" />
     <Compile Include="Counters\FunctionalStringCounter.cs" />
     <Compile Include="Counters\ICounter.cs" />
     <Compile Include="Counters\IncrementCounter.cs" />
@@ -87,6 +88,8 @@
     <Compile Include="Definitions\SymbolInitializationException.cs" />
     <Compile Include="Definitions\Variable.cs" />
     <Compile Include="Extensions\SymbolExtensions.cs" />
+    <Compile Include="Interpreter\Implementations\OperatorImplementation.cs" />
+    <Compile Include="Interpreter\ValueObject.cs" />
     <Compile Include="Language.cs" />
     <Compile Include="Parser\LiteralException.cs" />
     <Compile Include="Parser\ParseTree\Block.cs" />

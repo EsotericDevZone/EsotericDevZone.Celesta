@@ -64,6 +64,12 @@ namespace EsotericDevZone.Celesta
             }
         }
 
+        public static Identifier ToIdentifier(this string fullName)
+        {
+            var id = DispatchIdentifier(fullName);
+            if (id.SymbolName == null) return null;
+            return new Identifier(id.Package, id.SymbolName);
+        }
 
     }
 }
