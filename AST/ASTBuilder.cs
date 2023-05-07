@@ -502,9 +502,13 @@ namespace EsotericDevZone.Celesta.AST
                     $"Wrong return type '{ret.OutputType}' in function '{fundecl.Function.FullName}' which returns '{fundecl.OutputType}'")
                 );
 
-            AbstractASTNode.AssertAllNodes<IfNode>(ast, node => node.Condition.OutputType == BooleanConstantType,
+            AbstractASTNode.AssertAllNodes<IfNode>(ast, 
+                node => node.Condition.OutputType == BooleanConstantType,
                 nd => throw new ArgumentException("If conditional must be a boolean expression"));
-            //AbstractASTNode.AssertAllNonNestedInTheSameType<>
+
+            AbstractASTNode.AssertAllNodes<RepeatNNode>(ast,
+                node => node.Count.OutputType == IntegerConstantType,
+                nd => throw new ArgumentException("Repeat counter must be of integer type"));            
         }
 
         class BuildNodeResult

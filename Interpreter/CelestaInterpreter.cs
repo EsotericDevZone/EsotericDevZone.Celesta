@@ -39,13 +39,7 @@ namespace EsotericDevZone.Celesta.Interpreter
             DataTypeProvider.Add(Decimal);
             DataTypeProvider.Add(String);
             DataTypeProvider.Add(Void);
-            DataTypeProvider.Add(Bool);
-
-            AddBuiltInFunction("print", Arrays.Of("string"), "void", args =>
-            {
-                Console.WriteLine(args[0].Value);
-                return new ValueObject(ASTBuilder.VoidType, null);
-            });
+            DataTypeProvider.Add(Bool);            
 
             AddBuiltInFunction("str", Arrays.Of("int"), "string", args => new ValueObject(String, args[0].Value.ToString()));
 
@@ -303,6 +297,17 @@ namespace EsotericDevZone.Celesta.Interpreter
                     throw new NotImplementedException("Invalid left-hand-side in assignment");
                 }
             }
+            if(node is RepeatNNode reptN)
+            {
+                int count = (int)Execute(reptN.Count, localContext).Value;
+                for(int i=0;i<count;i++)
+                {
+                    var value = Execute(reptN.LoopLogic, localContext);
+                    if (value.ScopeMustReturn)
+                        return value;
+                }
+                return new ValueObject(ASTBuilder.VoidType, null);
+            }
 
             throw new ArgumentException($"Node not implemented : {node.GetType()}");            
         }
@@ -316,6 +321,38 @@ namespace EsotericDevZone.Celesta.Interpreter
                 nd => throw new ArgumentException("Syscall functions are not supported by this interpreter"));
             //_ast.
             return Execute(_ast, null).Value;
+        }
+
+        public static CelestaInterpreter ConsoleDefault
+        {
+            get
+            {
+                var interpreter = new CelestaInterpreter();
+
+                interpreter.AddBuiltInFunction("println", Arrays.Of("string"), "void", args =>
+                {
+                    Console.WriteLine(args[0].Value);
+                    return new ValueObject(interpreter.ASTBuilder.VoidType, null);
+                });
+
+                interpreter.AddBuiltInFunction("print", Arrays.Of("string"), "void", args =>
+                {
+                    Console.Write(args[0].Value);
+                    return new ValueObject(interpreter.ASTBuilder.VoidType, null);
+                });
+
+                interpreter.AddBuiltInFunction("readline", Arrays.Empty<string>(), "string", args =>
+                {
+                    return new ValueObject(interpreter.ASTBuilder.StringConstantType, Console.ReadLine());
+                });
+
+                interpreter.AddBuiltInFunction("readint", Arrays.Empty<string>(), "int", args =>
+                {
+                    return new ValueObject(interpreter.ASTBuilder.IntegerConstantType, Convert.ToInt32(Console.ReadLine()));
+                });
+
+                return interpreter; 
+            }
         }
     }
 }
