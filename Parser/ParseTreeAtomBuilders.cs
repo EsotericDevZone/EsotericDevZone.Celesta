@@ -6,6 +6,13 @@ namespace EsotericDevZone.Celesta.Parser
 {
     internal static class ParseTreeAtomBuilders
     {
+        public static AtomResult BoolLiteral(string input)
+        {
+            if (input == "true" || input == "false")
+                return AtomResult.Atom(new BoolLiteral(input));
+            return AtomResult.Error($"Not a boolean: '{input}'");
+        }
+
         public static AtomResult StringLiteral(string input)
         {
             var atom = AtomBuilders.DoubleQuotedString(input);

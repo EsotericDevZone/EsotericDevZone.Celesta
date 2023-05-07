@@ -7,9 +7,9 @@ namespace EsotericDevZone.Celesta.AST
         
         public VariableNode VariableNode { get; internal set; }        
         public DataType DataType => VariableNode.OutputType;
-        public IASTNode AssignedExpression { get; internal set; }
+        public IExpressionNode AssignedExpression { get; internal set; }
 
-        internal VariableDeclarationNode(IASTNode parent, VariableNode variable = null, IASTNode assignedExpression = null)
+        internal VariableDeclarationNode(IASTNode parent, VariableNode variable = null, IExpressionNode assignedExpression = null)
             : base(parent)
         {
             VariableNode = variable;            

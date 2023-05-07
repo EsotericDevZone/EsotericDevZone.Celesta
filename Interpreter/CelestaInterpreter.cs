@@ -14,6 +14,7 @@ using EsotericDevZone.Celesta.Parser.ParseTree;
 using EsotericDevZone.RuleBasedParser;
 using EsotericDevZone.Celesta.Interpreter.Implementations;
 using EsotericDevZone.Core;
+using System.Diagnostics;
 
 namespace EsotericDevZone.Celesta.Interpreter
 {
@@ -32,11 +33,13 @@ namespace EsotericDevZone.Celesta.Interpreter
             var Decimal = DataType.Primitive("decimal", "", "@main");
             var String = DataType.Primitive("string", "", "@main");
             var Void = DataType.Primitive("void", "", "@main");
+            var Bool = DataType.Primitive("bool", "", "@main");
             
             DataTypeProvider.Add(Int);
             DataTypeProvider.Add(Decimal);
             DataTypeProvider.Add(String);
             DataTypeProvider.Add(Void);
+            DataTypeProvider.Add(Bool);
 
             AddBuiltInFunction("print", Arrays.Of("string"), "void", args =>
             {
@@ -60,12 +63,14 @@ namespace EsotericDevZone.Celesta.Interpreter
             typeDefaults.SetDefaultValue(Int, () => new IntegerConstantNode(null, 0, Int));
             typeDefaults.SetDefaultValue(Decimal, () => new RealConstantNode(null, 0.0, Decimal));
             typeDefaults.SetDefaultValue(String, () => new StringConstantNode(null, "", String));
+            typeDefaults.SetDefaultValue(Bool, () => new BooleanConstantNode(null, false, Bool));
 
             ASTBuilder = new ASTBuilder(DataTypeProvider, VariableProvider, FunctionProvider, OperatorProvider, typeDefaults);
             ASTBuilder.IntegerConstantType = DataTypeProvider.Find("int", "@main").First();
             ASTBuilder.RealConstantType = DataTypeProvider.Find("decimal", "@main").First();
             ASTBuilder.StringConstantType = DataTypeProvider.Find("string", "@main").First();
             ASTBuilder.VoidType = DataTypeProvider.Find("void", "@main").First();
+            ASTBuilder.BooleanConstantType = DataTypeProvider.Find("bool", "@main").First();
         }
 
         private Dictionary<Operator, OperatorImplementation> OperatorImplementations = new Dictionary<Operator, OperatorImplementation>();
@@ -134,6 +139,10 @@ namespace EsotericDevZone.Celesta.Interpreter
             if(node is StringConstantNode constString)
             {
                 return new ValueObject(ASTBuilder.StringConstantType, constString.Value);
+            }            
+            if(node is BooleanConstantNode constBool)
+            {
+                return new ValueObject(ASTBuilder.BooleanConstantType, constBool.Value);
             }
 
             if(node is IBlockNode blockNode)
@@ -182,7 +191,7 @@ namespace EsotericDevZone.Celesta.Interpreter
             }
             if(node is FunctionDeclarationNode fdecl)
             {
-                var fun = fdecl.Function;
+                var fun = fdecl.Function;                
                 if (FunctionImplementations.ContainsKey(fun))
                     throw new ArgumentException($"Function implementation already defined : {fun}");
 
@@ -234,6 +243,10 @@ namespace EsotericDevZone.Celesta.Interpreter
         {
             var _node = Parser.Parse<IParseTreeNode>(input);
             var _ast = ASTBuilder.BuildNode(_node);
+
+            AbstractASTNode.AssertAllNodes<FunctionDeclarationNode>(_ast, nd => !(nd is SyscallFunction),
+                nd => throw new ArgumentException("Syscall functions are not supported by this interpreter"));
+            //_ast.
             return Execute(_ast, null).Value;
         }
     }

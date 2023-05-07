@@ -52,6 +52,7 @@
     <Compile Include="AST\AssignmentNode.cs" />
     <Compile Include="AST\ASTBuilder.cs" />
     <Compile Include="AST\ASTBuildNodeException.cs" />
+    <Compile Include="AST\BooleanConstantNode.cs" />
     <Compile Include="AST\FunctionFormalParameterNode.cs" />
     <Compile Include="AST\IfNode.cs" />
     <Compile Include="AST\OperatorNode.cs" />
@@ -95,6 +96,7 @@
     <Compile Include="Language.cs" />
     <Compile Include="Parser\LiteralException.cs" />
     <Compile Include="Parser\ParseTree\Block.cs" />
+    <Compile Include="Parser\ParseTree\BoolLiteral.cs" />
     <Compile Include="Parser\ParseTree\FunctionArgumentDeclaration.cs" />
     <Compile Include="Parser\ParseTree\FunctionDeclaration.cs" />
     <Compile Include="Parser\ParseTree\IfBlock.cs" />

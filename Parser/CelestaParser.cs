@@ -10,6 +10,7 @@ namespace EsotericDevZone.Celesta.Parser
             RegisterAtom("NUMBER", ParseTreeAtomBuilders.NumberLiteral);
             RegisterAtom("INT", AtomBuilders.Integer);
             RegisterAtom("STRING", ParseTreeAtomBuilders.StringLiteral);
+            RegisterAtom("BOOL", ParseTreeAtomBuilders.BoolLiteral);
 
             ParseRules.RegisterRule("@IDENTIFIER", "SYMBOL ?? # SYMBOL", ParseTreeNodeBuilders.Identifier);                        
 
@@ -29,6 +30,7 @@ namespace EsotericDevZone.Celesta.Parser
             ParseRules.RegisterRule("@STERM", "@IDENTIFIER", ParseResultBuilders.Self);
             ParseRules.RegisterRule("@STERM", "NUMBER", ParseResultBuilders.Self);
             ParseRules.RegisterRule("@STERM", "STRING", ParseResultBuilders.Self);
+            ParseRules.RegisterRule("@STERM", "BOOL", ParseResultBuilders.Self);
             ParseRules.RegisterRule("@STERM", "( @EXPR )", ParseResultBuilders.Self);
             ParseRules.RegisterRule("@STERM", "+|- @EXPR", ParseTreeNodeBuilders.UnaryOperator);
 

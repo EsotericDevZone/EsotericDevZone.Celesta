@@ -56,6 +56,7 @@ namespace EsotericDevZone.Celesta.AST
         public DataType IntegerConstantType { get; internal set; }
         public DataType RealConstantType { get; internal set; }
         public DataType StringConstantType { get; internal set; }
+        public DataType BooleanConstantType { get; internal set; }
         public DataType VoidType { get; internal set; }
         public IDataTypeDefaultValueGetter DataTypeDefaultValues { get; internal set; }
 
@@ -114,6 +115,10 @@ namespace EsotericDevZone.Celesta.AST
             , IFunctionProvider functionProv, IOperatorProvider operatorProv,
             IASTNode parent)
         {
+            if(parseTreeNode is BoolLiteral boolLiteral)
+            {
+                return BuildNodeResult.Node(new BooleanConstantNode(parent, boolLiteral.Value == "true", BooleanConstantType));
+            }
             if (parseTreeNode is NumericLiteral numericLiteral) 
             {
                 var valueStr = numericLiteral.Value;
@@ -184,9 +189,18 @@ namespace EsotericDevZone.Celesta.AST
                 if (assignedExpression.Failed)
                     return assignedExpression;
 
-                decl.AssignedExpression = assignedExpression.ASTNode;
+                assignedExpression = ExpectExpression(assignedExpression, out var assignExprNode);
+                if (assignedExpression.Failed)
+                    return assignedExpression;
 
-                variableProv.Add(variable);
+                decl.AssignedExpression = assignExprNode;
+
+                if (decl.AssignedExpression.OutputType.FullName != variable.DataType.FullName)
+                {
+                    return BuildNodeResult.Error("Type mismatch in variable declaration");
+                }
+
+                variableProv.Add(variable);                
 
                 return BuildNodeResult.Node(decl);
             }

@@ -14,8 +14,9 @@ namespace EsotericDevZone.Celesta
 
             "type", "record", "endrecord",
             "function", "endfunction", "begin", "return",
-            
-            "syscall"
+
+            "syscall",
+            "true", "false"
             );
     }
 }
