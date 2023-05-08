@@ -10,6 +10,19 @@ namespace EsotericDevZone.Celesta.Parser
 {
     internal static class ParseTreeNodeBuilders
     {
+        public static ParseResult ImportSymbol(ParseResult[] results)
+        {
+            return new ParseResult(results[0].GeneratorToken,
+                new Import(results[0].Value as string, false));
+        }
+
+        public static ParseResult ImportPath(ParseResult[] results)
+        {
+            Console.WriteLine(results[0]);
+            return new ParseResult(results[0].GeneratorToken,
+                new Import((results[0].Value as StringLiteral).Value, true));
+        }
+
         public static ParseResult Identifier(ParseResult[] results)
         {
             return new ParseResult(results[0].GeneratorToken,

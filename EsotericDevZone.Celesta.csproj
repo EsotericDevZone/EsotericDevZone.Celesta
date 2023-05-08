@@ -55,6 +55,7 @@
     <Compile Include="AST\BooleanConstantNode.cs" />
     <Compile Include="AST\FunctionFormalParameterNode.cs" />
     <Compile Include="AST\IfNode.cs" />
+    <Compile Include="AST\ImportNode.cs" />
     <Compile Include="AST\OperatorNode.cs" />
     <Compile Include="AST\RepeatNNode.cs" />
     <Compile Include="AST\ReturnNode.cs" />
@@ -69,6 +70,8 @@
     <Compile Include="AST\StringConstantNode.cs" />
     <Compile Include="AST\FunctionDeclarationNode.cs" />
     <Compile Include="AST\FunctionCallNode.cs" />
+    <Compile Include="AST\TypeAliasNode.cs" />
+    <Compile Include="AST\Utils\IImportResolver.cs" />
     <Compile Include="AST\VariableDeclarationNode.cs" />
     <Compile Include="AST\VariableNode.cs" />
     <Compile Include="AST\VoidExpressionNode.cs" />
@@ -91,6 +94,7 @@
     <Compile Include="Extensions\SymbolExtensions.cs" />
     <Compile Include="Interpreter\Implementations\FunctionImplementation.cs" />
     <Compile Include="Interpreter\Implementations\OperatorImplementation.cs" />
+    <Compile Include="Interpreter\ImportResolver.cs" />
     <Compile Include="Interpreter\LocalContext.cs" />
     <Compile Include="Interpreter\ValueObject.cs" />
     <Compile Include="Language.cs" />
@@ -101,6 +105,7 @@
     <Compile Include="Parser\ParseTree\FunctionDeclaration.cs" />
     <Compile Include="Parser\ParseTree\IfBlock.cs" />
     <Compile Include="Parser\ParseTree\FunctionCall.cs" />
+    <Compile Include="Parser\ParseTree\Import.cs" />
     <Compile Include="Parser\ParseTree\NameAccessor.cs" />
     <Compile Include="Parser\ParseTree\Assignment.cs" />
     <Compile Include="Parser\CelestaParser.cs" />

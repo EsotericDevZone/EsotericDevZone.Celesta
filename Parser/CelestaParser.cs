@@ -77,6 +77,9 @@ namespace EsotericDevZone.Celesta.Parser
 
             ParseRules.RegisterRule("@BLOCK", "@INSTR ; ?? @INSTR ;", ParseTreeNodeBuilders.Block);
 
+            ParseRules.RegisterRule("@IMPORT", "import STRING", ParseTreeNodeBuilders.ImportPath);
+            ParseRules.RegisterRule("@IMPORT", "import SYMBOL", ParseTreeNodeBuilders.ImportSymbol);            
+
             ParseRules.RegisterRule("@INSTR", "@WHILE", ParseResultBuilders.Self);
             ParseRules.RegisterRule("@INSTR", "@REPTN", ParseResultBuilders.Self);
             ParseRules.RegisterRule("@INSTR", "@IF", ParseResultBuilders.Self);
@@ -88,6 +91,7 @@ namespace EsotericDevZone.Celesta.Parser
             ParseRules.RegisterRule("@INSTR", "@VDECL", ParseResultBuilders.Self);
             ParseRules.RegisterRule("@INSTR", "@ASSIGN", ParseResultBuilders.Self);
             ParseRules.RegisterRule("@INSTR", "@FUNCALL", ParseResultBuilders.Self);            
+            ParseRules.RegisterRule("@INSTR", "@IMPORT", ParseResultBuilders.Self); 
 
             ParseRules.RegisterRule("@CODE", "@BLOCK", ParseResultBuilders.Self);
             ParseRules.RegisterRule("@CODE", "@INSTR", ParseResultBuilders.Self);

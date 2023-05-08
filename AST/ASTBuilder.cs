@@ -2,57 +2,20 @@
 using EsotericDevZone.Celesta.Counters;
 using EsotericDevZone.Celesta.Definitions;
 using EsotericDevZone.Celesta.Definitions.Functions;
+using EsotericDevZone.Celesta.Parser;
 using EsotericDevZone.Celesta.Parser.ParseTree;
 using EsotericDevZone.Celesta.Providers;
 using EsotericDevZone.Core;
 using EsotericDevZone.Core.Collections;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace EsotericDevZone.Celesta.AST
 {
     public class ASTBuilder
-    {       
-        public static ASTBuilder GetDebug()
-        {
-            var dtprov = new DataTypeProvider();
-            var vbprov = new VariableProvider();
-            var fnprov = new FunctionProvider();
-            var opprov = new OperatorProvider();            
-
-            var Int = DataType.Primitive("int", "", "@main");
-            var Decimal = DataType.Primitive("decimal", "", "@main");
-            var String = DataType.Primitive("string", "", "@main");
-            var Void = DataType.Primitive("void", "", "@main");
-
-            fnprov.Add(new BuiltInFunction("print", "", Arrays.Of(Int), Void));
-
-            dtprov.Add(Int);
-            dtprov.Add(Decimal);
-            dtprov.Add(String);
-            dtprov.Add(Void);
-
-            opprov.Add(Operator.BinaryOperator("+", Int, Int, Int));
-            opprov.Add(Operator.BinaryOperator("-", Int, Int, Int));
-            opprov.Add(Operator.BinaryOperator("<", Int, Int, Int));
-            opprov.Add(Operator.BinaryOperator(">", Int, Int, Int));
-            opprov.Add(Operator.BinaryOperator("==", Int, Int, Int));
-            opprov.Add(Operator.UnaryOperator("-", Int, Int));
-
-            var typeDefaults = new DataTypeDefaultValueGetter();
-            typeDefaults.SetDefaultValue(Int, () => new IntegerConstantNode(null, 0, Int));
-
-            var astb = new ASTBuilder(dtprov, vbprov, fnprov, opprov, typeDefaults);
-
-            astb.IntegerConstantType = dtprov.Find("int", "@main").First();
-            astb.RealConstantType = dtprov.Find("decimal", "@main").First();
-            astb.StringConstantType = dtprov.Find("string", "@main").First();
-            astb.VoidType = dtprov.Find("void", "@main").First();
-
-            return astb;
-        }
-
+    {
         public DataType IntegerConstantType { get; internal set; }
         public DataType RealConstantType { get; internal set; }
         public DataType StringConstantType { get; internal set; }
@@ -473,10 +436,67 @@ namespace EsotericDevZone.Celesta.AST
                 funcallNode.Arguments = argNodes.ToArray();
                 return BuildNodeResult.Node(funcallNode);
             }
+            if(parseTreeNode is TypeAlias typeAlias)
+            {
+                var name = typeAlias.TypeName;
+                var package = AbstractASTNode.GetPackage(parent);
+                var scope = AbstractASTNode.GetScope(parent);
+                var refType = dataTypeProv.Resolve(typeAlias.ReferencedType, scope, false);
+                if (refType == null)
+                    return BuildNodeResult.Error($"Type not found : {typeAlias.ReferencedType}");
+
+                if (dataTypeProv.Resolve(new Identifier(package, name), scope, false) != null)
+                    return BuildNodeResult.Error($"Target type already exists : {package}#{name}");
+
+                bool isolated = typeAlias.Isolated;
+                var newDataType = DataType.Alias(name, package, scope, refType, isolated);
+
+                var aliasNode = new TypeAliasNode(parent, newDataType, refType);
+
+                dataTypeProv.Add(newDataType);
+                return BuildNodeResult.Node(aliasNode);
+            }
+            if(parseTreeNode is Import import)
+            {
+                string path = "";
+
+                try
+                {
+                    path = ImportResolver?.GetSourcePath(import.Source, import.IsFilePath);
+                }
+                catch (FileNotFoundException e)
+                {
+                    return BuildNodeResult.Error(e.Message);
+                }
+
+                if (path == null)
+                    return BuildNodeResult.Error($"Unable to import dependency : '{import.Source}'");
+                path = Path.GetFullPath(path);
+                if (!File.Exists(path))
+                    return BuildNodeResult.Error($"Import file not found : '{path}'");
+
+                if (!Imports.Any(_ => _.Source == path)) 
+                {
+                    var source = File.ReadAllText(path);
+
+                    var importParseTreeNode = new CelestaParser().Parse<IParseTreeNode>(source);
+                    var importNode = BuildNodeRec(importParseTreeNode, dataTypeProv, variableProv, functionProv, operatorProv, parent);
+                    if (importNode.Failed)
+                        return importNode;
+                    Imports.Add((path, importNode.ASTNode));
+                }                
+
+                var node = new ImportNode(parent, path);
+                return BuildNodeResult.Node(node);
+            }
 
 
             return BuildNodeResult.Error($"Unknown node : {parseTreeNode.GetType().Name}");
         }
+
+        public List<(string Source, IASTNode Node)> Imports = new List<(string, IASTNode)>();
+
+        public IImportResolver ImportResolver { get; set; }
 
         private BuildNodeResult ExpectExpression(BuildNodeResult node, out IExpressionNode expr)
         {

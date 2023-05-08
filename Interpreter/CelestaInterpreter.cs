@@ -27,13 +27,21 @@ namespace EsotericDevZone.Celesta.Interpreter
 
         private ASTBuilder ASTBuilder;        
 
+        public DataType IntegerType { get; }
+        public DataType DecimalType { get; }
+        public DataType StringType { get; }
+        public DataType VoidType { get; }
+        public DataType BoolType { get; }
+
+        public IImportResolver ImportResolver = new ImportResolver();
+
         public CelestaInterpreter()
         {
-            var Int = DataType.Primitive("int", "", "@main");
-            var Decimal = DataType.Primitive("decimal", "", "@main");
-            var String = DataType.Primitive("string", "", "@main");
-            var Void = DataType.Primitive("void", "", "@main");
-            var Bool = DataType.Primitive("bool", "", "@main");
+            var Int = IntegerType = DataType.Primitive("int", "", "@main");
+            var Decimal = DecimalType = DataType.Primitive("decimal", "", "@main");
+            var String = StringType = DataType.Primitive("string", "", "@main");
+            var Void = VoidType = DataType.Primitive("void", "", "@main");
+            var Bool = BoolType = DataType.Primitive("bool", "", "@main");            
             
             DataTypeProvider.Add(Int);
             DataTypeProvider.Add(Decimal);
@@ -68,6 +76,7 @@ namespace EsotericDevZone.Celesta.Interpreter
             typeDefaults.SetDefaultValue(Bool, () => new BooleanConstantNode(null, false, Bool));
 
             ASTBuilder = new ASTBuilder(DataTypeProvider, VariableProvider, FunctionProvider, OperatorProvider, typeDefaults);
+            ASTBuilder.ImportResolver = ImportResolver;
             ASTBuilder.IntegerConstantType = DataTypeProvider.Find("int", "@main").First();
             ASTBuilder.RealConstantType = DataTypeProvider.Find("decimal", "@main").First();
             ASTBuilder.StringConstantType = DataTypeProvider.Find("string", "@main").First();
@@ -99,7 +108,7 @@ namespace EsotericDevZone.Celesta.Interpreter
             FunctionProvider.Add(fun);
             var impl = new FunctionImplementation(fun, func);
             FunctionImplementations[fun] = impl;
-        }
+        }        
 
         public void AddOperator(string opName, string in1Type, string in2Type, string outType, Func<ValueObject, ValueObject, ValueObject> func)
         {
@@ -144,19 +153,19 @@ namespace EsotericDevZone.Celesta.Interpreter
         {
             if(node is IntegerConstantNode constInt)
             {
-                return new ValueObject(ASTBuilder.IntegerConstantType, constInt.Value);
+                return new ValueObject(IntegerType, constInt.Value);
             }
             if(node is RealConstantNode constReal)
             {
-                return new ValueObject(ASTBuilder.RealConstantType, constReal.Value);
+                return new ValueObject(DecimalType, constReal.Value);
             }
             if(node is StringConstantNode constString)
             {
-                return new ValueObject(ASTBuilder.StringConstantType, constString.Value);
+                return new ValueObject(StringType, constString.Value);
             }            
             if(node is BooleanConstantNode constBool)
             {
-                return new ValueObject(ASTBuilder.BooleanConstantType, constBool.Value);
+                return new ValueObject(BoolType, constBool.Value);
             }
 
             if(node is IBlockNode blockNode)
@@ -167,7 +176,7 @@ namespace EsotericDevZone.Celesta.Interpreter
                     if (eval.ScopeMustReturn)
                         return eval;                    
                 }
-                return new ValueObject(ASTBuilder.VoidType, null);
+                return new ValueObject(VoidType, null);
             }
             if (node is VariableDeclarationNode vdecl) 
             {
@@ -223,7 +232,7 @@ namespace EsotericDevZone.Celesta.Interpreter
                 });
 
 
-                return new ValueObject(ASTBuilder.VoidType, null);
+                return new ValueObject(VoidType, null);
             }
             if (node is FunctionCallNode funcall) 
             {
@@ -242,8 +251,8 @@ namespace EsotericDevZone.Celesta.Interpreter
             }            
             if(node is ReturnNode ret)
             {
-                if (ret.OutputType.FullName == ASTBuilder.VoidType.FullName)
-                    return new ValueObject(ASTBuilder.VoidType, null) { ScopeMustReturn = true };
+                if (ret.OutputType.FullName == VoidType.FullName)
+                    return new ValueObject(VoidType, null) { ScopeMustReturn = true };
                 var result = Execute(ret.ReturnedExpression, localContext);
                 result.ScopeMustReturn = true;
                 return result;
@@ -263,7 +272,7 @@ namespace EsotericDevZone.Celesta.Interpreter
                     if (value.ScopeMustReturn)
                         return value;
                 }
-                return new ValueObject(ASTBuilder.VoidType, null);
+                return new ValueObject(VoidType, null);
             }
             if(node is WhileNode whileNode)
             {
@@ -273,7 +282,7 @@ namespace EsotericDevZone.Celesta.Interpreter
                     if (value.ScopeMustReturn)
                         return value;
                 }
-                return new ValueObject(ASTBuilder.VoidType, null);
+                return new ValueObject(VoidType, null);
             }
             if(node is AssignmentNode assign)
             {
@@ -284,13 +293,13 @@ namespace EsotericDevZone.Celesta.Interpreter
                 {
                     var value = Execute(rhs, localContext);
                     SetVariableValue(variable, value);
-                    return new ValueObject(ASTBuilder.VoidType, null);
+                    return new ValueObject(VoidType, null);
                 }
                 else if (lhs is FunctionFormalParameterNode fParam) 
                 {
                     var value = Execute(rhs, localContext);
                     localContext.FormalParameters[fParam.Name] = value;
-                    return new ValueObject(ASTBuilder.VoidType, null);
+                    return new ValueObject(VoidType, null);
                 }
                 else
                 {
@@ -306,18 +315,37 @@ namespace EsotericDevZone.Celesta.Interpreter
                     if (value.ScopeMustReturn)
                         return value;
                 }
-                return new ValueObject(ASTBuilder.VoidType, null);
+                return new ValueObject(VoidType, null);
+            }
+            if (node is TypeAliasNode) 
+            {
+                return new ValueObject(VoidType, null);
+            }            
+            if(node is ImportNode importNode)
+            {
+                if(ImportedSources.Contains(importNode.Source))
+                    return new ValueObject(VoidType, null);
+
+                var toImportQ = ASTBuilder.Imports.Where(_ => _.Source == importNode.Source).ToArray();
+                var toImport = toImportQ.Length == 0 ? null : toImportQ[0].Node;                
+
+                Execute(toImport, localContext);
+
+
+                return new ValueObject(VoidType, null);
             }
 
             throw new ArgumentException($"Node not implemented : {node.GetType()}");            
         }
+
+        private ISet<string> ImportedSources = new HashSet<string>();
 
         public object Execute(string input)
         {
             var _node = Parser.Parse<IParseTreeNode>(input);
             var _ast = ASTBuilder.BuildNode(_node);
 
-            AbstractASTNode.AssertAllNodes<FunctionDeclarationNode>(_ast, nd => !(nd is SyscallFunction),
+            AbstractASTNode.AssertAllNodes<FunctionDeclarationNode>(_ast, nd => !(nd.Function is SyscallFunction),
                 nd => throw new ArgumentException("Syscall functions are not supported by this interpreter"));
             //_ast.
             return Execute(_ast, null).Value;
@@ -329,26 +357,32 @@ namespace EsotericDevZone.Celesta.Interpreter
             {
                 var interpreter = new CelestaInterpreter();
 
+                interpreter.AddOperator("+", "string", "int", "string", (str, x) =>
+                {
+                    return new ValueObject(interpreter.GetTypeByFullName("string"),
+                        (str.Value as string) + ((int)x.Value).ToString());
+                });
+
                 interpreter.AddBuiltInFunction("println", Arrays.Of("string"), "void", args =>
                 {
                     Console.WriteLine(args[0].Value);
-                    return new ValueObject(interpreter.ASTBuilder.VoidType, null);
+                    return new ValueObject(interpreter.VoidType, null);
                 });
 
                 interpreter.AddBuiltInFunction("print", Arrays.Of("string"), "void", args =>
                 {
                     Console.Write(args[0].Value);
-                    return new ValueObject(interpreter.ASTBuilder.VoidType, null);
+                    return new ValueObject(interpreter.VoidType, null);
                 });
 
                 interpreter.AddBuiltInFunction("readline", Arrays.Empty<string>(), "string", args =>
                 {
-                    return new ValueObject(interpreter.ASTBuilder.StringConstantType, Console.ReadLine());
+                    return new ValueObject(interpreter.StringType, Console.ReadLine());
                 });
 
                 interpreter.AddBuiltInFunction("readint", Arrays.Empty<string>(), "int", args =>
                 {
-                    return new ValueObject(interpreter.ASTBuilder.IntegerConstantType, Convert.ToInt32(Console.ReadLine()));
+                    return new ValueObject(interpreter.IntegerType, Convert.ToInt32(Console.ReadLine()));
                 });
 
                 return interpreter; 
