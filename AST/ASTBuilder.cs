@@ -480,10 +480,22 @@ namespace EsotericDevZone.Celesta.AST
                     var source = File.ReadAllText(path);
 
                     var importParseTreeNode = new CelestaParser().Parse<IParseTreeNode>(source);
-                    var importNode = BuildNodeRec(importParseTreeNode, dataTypeProv, variableProv, functionProv, operatorProv, parent);
-                    if (importNode.Failed)
-                        return importNode;
-                    Imports.Add((path, importNode.ASTNode));
+                    var importNodeR = BuildNodeRec(importParseTreeNode, dataTypeProv, variableProv, functionProv, operatorProv, parent);
+                    if (importNodeR.Failed)
+                        return importNodeR;
+
+                    var importNode = importNodeR.ASTNode;                    
+
+                    try
+                    {
+                        ValidateAST(importNode);
+                    }
+                    catch(Exception e)
+                    {
+                        return BuildNodeResult.Error(e.Message);
+                    }
+
+                    Imports.Add((path, importNode));
                 }                
 
                 var node = new ImportNode(parent, path);
@@ -528,7 +540,11 @@ namespace EsotericDevZone.Celesta.AST
 
             AbstractASTNode.AssertAllNodes<RepeatNNode>(ast,
                 node => node.Count.OutputType == IntegerConstantType,
-                nd => throw new ArgumentException("Repeat counter must be of integer type"));            
+                nd => throw new ArgumentException("Repeat counter must be of integer type"));
+
+            AbstractASTNode.AssertAllNodes<PackageNode>(ast,
+                node => node.Parent == null || node.Parent is PackageNode,
+                nd => throw new ArgumentException("Package node must be top-level statement or nested in another package"));
         }
 
         class BuildNodeResult

@@ -17,8 +17,7 @@ namespace EsotericDevZone.Celesta.Parser
         }
 
         public static ParseResult ImportPath(ParseResult[] results)
-        {
-            Console.WriteLine(results[0]);
+        {            
             return new ParseResult(results[0].GeneratorToken,
                 new Import((results[0].Value as StringLiteral).Value, true));
         }
