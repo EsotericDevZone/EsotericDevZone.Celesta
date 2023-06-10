@@ -89,7 +89,7 @@ namespace EsotericDevZone.Celesta.Parser
             ParseRules.RegisterRule("@INSTR", "@VDECL", ParseResultBuilders.Self);
             ParseRules.RegisterRule("@INSTR", "@ASSIGN", ParseResultBuilders.Self);
             ParseRules.RegisterRule("@INSTR", "@FUNCALL", ParseResultBuilders.Self);
-            ParseRules.RegisterRule("@INSTR", "@IMPORT", ParseResultBuilders.Self); 
+            ParseRules.RegisterRule("@INSTR", "@IMPORT", ParseResultBuilders.Self);
 
             ParseRules.RegisterRule("@CODE", "@BLOCK", ParseResultBuilders.Self);
             ParseRules.RegisterRule("@CODE", "@EXPR", ParseResultBuilders.Self);
@@ -98,7 +98,5 @@ namespace EsotericDevZone.Celesta.Parser
 
             RootRuleKey = "@CODE";
         }
-
-        
     }
 }
