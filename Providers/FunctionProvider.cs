@@ -9,7 +9,7 @@ using System.Xml.Linq;
 
 namespace EsotericDevZone.Celesta.Providers
 {
-    internal class FunctionProvider : AbstractSymbolProvider<Function>, IFunctionProvider
+    public class FunctionProvider : AbstractSymbolProvider<Function>, IFunctionProvider
     {
         public Function GetBySyscallId(int syscallId)
         {

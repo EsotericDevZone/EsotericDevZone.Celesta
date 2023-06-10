@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace EsotericDevZone.Celesta.Providers
 {
-    internal class OperatorProvider : AbstractSymbolProvider<Operator>, IOperatorProvider
+    public class OperatorProvider : AbstractSymbolProvider<Operator>, IOperatorProvider
     {
         public IEnumerable<Operator> FindBinary(string name, DataType argType1, DataType argType2)
             => Where(o => o.IsBinary && o.Name == name 

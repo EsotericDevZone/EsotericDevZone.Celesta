@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace EsotericDevZone.Celesta.Providers
 {
-    internal class AbstractSymbolProvider<T> : ISymbolProvider<T> where T : class, ISymbol
+    public class AbstractSymbolProvider<T> : ISymbolProvider<T> where T : class, ISymbol
     {
         List<T> Symbols = new List<T>();
 

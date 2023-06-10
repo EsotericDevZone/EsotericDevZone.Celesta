@@ -2,7 +2,7 @@
 
 namespace EsotericDevZone.Celesta.Providers
 {
-    internal class DataTypeProvider : AbstractSymbolProvider<DataType>, IDataTypeProvider
+    public class DataTypeProvider : AbstractSymbolProvider<DataType>, IDataTypeProvider
     {
     }
 }

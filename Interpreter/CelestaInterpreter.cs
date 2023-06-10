@@ -159,7 +159,7 @@ namespace EsotericDevZone.Celesta.Interpreter
             return Variables[variable.Variable.FullName];
         }
 
-        private ValueObject Execute(IASTNode node, LocalContext localContext)
+        private ValueObject ExecuteAST(IASTNode node, LocalContext localContext)
         {
             if(node is IntegerConstantNode constInt)
             {
@@ -182,7 +182,7 @@ namespace EsotericDevZone.Celesta.Interpreter
             {
                 foreach (var child in blockNode.GetChildren())
                 {
-                    var eval = Execute(child, localContext);
+                    var eval = ExecuteAST(child, localContext);
                     if (eval.ScopeMustReturn)
                         return eval;                    
                 }
@@ -192,7 +192,7 @@ namespace EsotericDevZone.Celesta.Interpreter
             {
                 var variable = vdecl.VariableNode;
                 var expression = vdecl.AssignedExpression;
-                var value = Execute(expression, localContext);
+                var value = ExecuteAST(expression, localContext);
                 SetVariableValue(variable, value);
                 return value;
             }
@@ -206,7 +206,7 @@ namespace EsotericDevZone.Celesta.Interpreter
                 try
                 {                    
                     var impl = OperatorImplementations[oper];
-                    ValueObject result = impl.Operation(op.Arguments.Select(_ => Execute(_, localContext)).ToArray());
+                    ValueObject result = impl.Operation(op.Arguments.Select(_ => ExecuteAST(_, localContext)).ToArray());
                     if (result.DataType.FullName != oper.OutputType.FullName)
                         throw new InvalidOperationException("Operator returned a different type than expected");
                     return result;
@@ -237,7 +237,7 @@ namespace EsotericDevZone.Celesta.Interpreter
                         {
                             context.FormalParameters[udf.FormalParameters[i].Name] = args[i];
                         }
-                        var result = Execute(fdecl.Body, context);
+                        var result = ExecuteAST(fdecl.Body, context);
                         result.ScopeMustReturn = false;
                         return result;
                     });
@@ -262,7 +262,7 @@ namespace EsotericDevZone.Celesta.Interpreter
                 try
                 {
                     var f = FunctionImplementations[funcall.Function];
-                    var result = f.Operation(funcall.Arguments.Select(_=>Execute(_,localContext)).ToArray());
+                    var result = f.Operation(funcall.Arguments.Select(_=>ExecuteAST(_,localContext)).ToArray());
                     if (result.DataType.FullName != funcall.OutputType.FullName) 
                         throw new InvalidOperationException("Function returned a different type than expected");
                     return result;
@@ -276,22 +276,22 @@ namespace EsotericDevZone.Celesta.Interpreter
             {
                 if (ret.OutputType.FullName == VoidType.FullName)
                     return new ValueObject(VoidType, null) { ScopeMustReturn = true };
-                var result = Execute(ret.ReturnedExpression, localContext);
+                var result = ExecuteAST(ret.ReturnedExpression, localContext);
                 result.ScopeMustReturn = true;
                 return result;
             }
             if(node is IfNode ifNode)
             {
-                var condition = Execute(ifNode.Condition, localContext);
+                var condition = ExecuteAST(ifNode.Condition, localContext);
                 if((bool)condition.Value)
                 {
-                    var value = Execute(ifNode.ThenBranch, localContext);
+                    var value = ExecuteAST(ifNode.ThenBranch, localContext);
                     if (value.ScopeMustReturn)
                         return value;
                 }
                 else if(ifNode.ElseBranch!=null)
                 {
-                    var value = Execute(ifNode.ElseBranch, localContext);
+                    var value = ExecuteAST(ifNode.ElseBranch, localContext);
                     if (value.ScopeMustReturn)
                         return value;
                 }
@@ -299,9 +299,9 @@ namespace EsotericDevZone.Celesta.Interpreter
             }
             if(node is WhileNode whileNode)
             {
-                while((bool)Execute(whileNode.Condition, localContext).Value)
+                while((bool)ExecuteAST(whileNode.Condition, localContext).Value)
                 {
-                    var value = Execute(whileNode.LoopLogic, localContext);
+                    var value = ExecuteAST(whileNode.LoopLogic, localContext);
                     if (value.ScopeMustReturn)
                         return value;
                 }
@@ -314,13 +314,13 @@ namespace EsotericDevZone.Celesta.Interpreter
 
                 if (lhs is VariableNode variable)
                 {
-                    var value = Execute(rhs, localContext);
+                    var value = ExecuteAST(rhs, localContext);
                     SetVariableValue(variable, value);
                     return new ValueObject(VoidType, null);
                 }
                 else if (lhs is FunctionFormalParameterNode fParam) 
                 {
-                    var value = Execute(rhs, localContext);
+                    var value = ExecuteAST(rhs, localContext);
                     localContext.FormalParameters[fParam.Name] = value;
                     return new ValueObject(VoidType, null);
                 }
@@ -331,10 +331,10 @@ namespace EsotericDevZone.Celesta.Interpreter
             }
             if(node is RepeatNNode reptN)
             {
-                int count = (int)Execute(reptN.Count, localContext).Value;
+                int count = (int)ExecuteAST(reptN.Count, localContext).Value;
                 for(int i=0;i<count;i++)
                 {
-                    var value = Execute(reptN.LoopLogic, localContext);
+                    var value = ExecuteAST(reptN.LoopLogic, localContext);
                     if (value.ScopeMustReturn)
                         return value;
                 }
@@ -352,7 +352,7 @@ namespace EsotericDevZone.Celesta.Interpreter
                 var toImportQ = ASTBuilder.Imports.Where(_ => _.Source == importNode.Source).ToArray();
                 var toImport = toImportQ.Length == 0 ? null : toImportQ[0].Node;                
 
-                Execute(toImport, localContext);
+                ExecuteAST(toImport, localContext);
 
 
                 return new ValueObject(VoidType, null);
@@ -367,12 +367,7 @@ namespace EsotericDevZone.Celesta.Interpreter
         {
             var _node = Parser.Parse<IParseTreeNode>(input);
             var _ast = ASTBuilder.BuildNode(_node);
-            Console.WriteLine(_ast);
-
-            /*AbstractASTNode.AssertAllNodes<FunctionDeclarationNode>(_ast, nd => !(nd.Function is SyscallFunction),
-                nd => throw new ArgumentException("Syscall functions are not supported by this interpreter"));
-            */
-            return Execute(_ast, null).Value;
+            return ExecuteAST(_ast, null).Value;
         }
 
         public static CelestaInterpreter ConsoleDefault
