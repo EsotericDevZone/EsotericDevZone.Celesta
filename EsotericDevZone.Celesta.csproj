@@ -34,6 +34,12 @@
     <ApplicationIcon>esodev2.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EsotericDevZone.Core, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\EsotericDevZone.Core.1.2.0\lib\net46\EsotericDevZone.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="EsotericDevZone.RuleBasedParser, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\EsotericDevZone.RuleBasedParser.1.2.0\lib\net46\EsotericDevZone.RuleBasedParser.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
@@ -140,16 +146,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\EsotericDevZone.Core\EsotericDevZone.Core.csproj">
-      <Project>{3897bd01-4139-4f16-b86c-ffb1d66bcba0}</Project>
-      <Name>EsotericDevZone.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\EsotericDevZone.RuleBasedParser\EsotericDevZone.RuleBasedParser.csproj">
-      <Project>{d7590acb-fa20-4a39-aa3c-f6861ee24838}</Project>
-      <Name>EsotericDevZone.RuleBasedParser</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
