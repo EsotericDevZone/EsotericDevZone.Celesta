@@ -40,11 +40,9 @@ namespace EsotericDevZone.Celesta.Parser
 
             ParseRules.RegisterRule("@FUNCALL", "@FTERM ( )", ParseTreeNodeBuilders.FunctionCall);
             ParseRules.RegisterRule("@FUNCALL", "@FTERM ( @EXPRLIST )", ParseTreeNodeBuilders.FunctionCall);            
-
-            ParseRules.RegisterRule("@TERM", "@FUNCALL", ParseResultBuilders.Self);
-            ParseRules.RegisterRule("@TERM", "@FTERM", ParseResultBuilders.Self);
-
-            ParseRules.RegisterRule("@TERM", "@FTERM", ParseResultBuilders.Self);
+            
+            ParseRules.RegisterRule("@TERM", "@FUNCALL", ParseResultBuilders.Self);            
+            ParseRules.RegisterRule("@TERM", "@FTERM", ParseResultBuilders.Self);            
 
             ParseRules.RegisterRule("@ASSIGN", "@TERM = @EXPR", ParseTreeNodeBuilders.Assignment);
 
@@ -90,12 +88,12 @@ namespace EsotericDevZone.Celesta.Parser
             ParseRules.RegisterRule("@INSTR", "@FDECL", ParseResultBuilders.Self);
             ParseRules.RegisterRule("@INSTR", "@VDECL", ParseResultBuilders.Self);
             ParseRules.RegisterRule("@INSTR", "@ASSIGN", ParseResultBuilders.Self);
-            ParseRules.RegisterRule("@INSTR", "@FUNCALL", ParseResultBuilders.Self);            
+            ParseRules.RegisterRule("@INSTR", "@FUNCALL", ParseResultBuilders.Self);
             ParseRules.RegisterRule("@INSTR", "@IMPORT", ParseResultBuilders.Self); 
 
             ParseRules.RegisterRule("@CODE", "@BLOCK", ParseResultBuilders.Self);
-            ParseRules.RegisterRule("@CODE", "@INSTR", ParseResultBuilders.Self);
             ParseRules.RegisterRule("@CODE", "@EXPR", ParseResultBuilders.Self);
+            ParseRules.RegisterRule("@CODE", "@INSTR", ParseResultBuilders.Self);
 
 
             RootRuleKey = "@CODE";
