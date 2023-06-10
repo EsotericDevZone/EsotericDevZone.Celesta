@@ -4,6 +4,7 @@ using EsotericDevZone.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Linq;
 
 namespace EsotericDevZone.Celesta.Providers
 {
@@ -38,6 +39,21 @@ namespace EsotericDevZone.Celesta.Providers
                 candidates = Find(identifier.Name, scope, argTypes).ToArray();
             else
                 candidates = Find(identifier.PackageName, identifier.Name, scope, argTypes).ToArray();
+            if (candidates.Length == 0)
+                return null;
+            if (strict && candidates.Length > 1)
+                throw new MultipleDefinitionException($"Multiple definitions of function {identifier}({argTypes.JoinToString(",")}):\n{candidates.JoinToString("\n").Indent("  ")}");
+            return candidates[0];
+        }
+
+        public Function Fit(Identifier identifier, string scope, DataType[] argTypes, bool strict)
+        {
+            Function[] candidates;
+            if (identifier.PackageName == "")
+                candidates = Find(identifier.Name, scope).ToArray();
+            else
+                candidates = Find(identifier.PackageName, identifier.Name, scope).ToArray();
+            candidates = candidates.Where(f => argTypes.Select((t, i) => (t, i)).All(p => p.t.Substitutes(f.ArgumentTypes[p.i]))).ToArray();
             if (candidates.Length == 0)
                 return null;
             if (strict && candidates.Length > 1)

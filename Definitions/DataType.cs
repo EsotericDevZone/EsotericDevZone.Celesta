@@ -51,5 +51,10 @@
             => isolated
                 ? new DataType(name, package, scope, DataTypeProperties.Alias | DataTypeProperties.Isolated, null, referencedType)
                 : new DataType(name, package, scope, DataTypeProperties.Alias, null, referencedType);
+
+        public bool Substitutes(DataType type)
+        {
+            return this == type || IsAliasOf(type);
+        }
     }
 }

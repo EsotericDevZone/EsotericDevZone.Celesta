@@ -87,7 +87,7 @@ namespace EsotericDevZone.Celesta.Interpreter
         private Dictionary<Operator, OperatorImplementation> OperatorImplementations = new Dictionary<Operator, OperatorImplementation>();
         private Dictionary<Function, FunctionImplementation> FunctionImplementations = new Dictionary<Function, FunctionImplementation>();
 
-        private DataType GetTypeByFullName(string name)
+        public DataType GetTypeByFullName(string name)
         {
             var identifier = name.ToIdentifier();
             if (identifier == null)
@@ -240,7 +240,7 @@ namespace EsotericDevZone.Celesta.Interpreter
                 {
                     var f = FunctionImplementations[funcall.Function];
                     var result = f.Operation(funcall.Arguments.Select(_=>Execute(_,localContext)).ToArray());
-                    if (result.DataType.FullName != funcall.OutputType.FullName)
+                    if (result.DataType.FullName != funcall.OutputType.FullName) 
                         throw new InvalidOperationException("Function returned a different type than expected");
                     return result;
                 }
@@ -344,6 +344,7 @@ namespace EsotericDevZone.Celesta.Interpreter
         {
             var _node = Parser.Parse<IParseTreeNode>(input);
             var _ast = ASTBuilder.BuildNode(_node);
+            Console.WriteLine(_ast);
 
             AbstractASTNode.AssertAllNodes<FunctionDeclarationNode>(_ast, nd => !(nd.Function is SyscallFunction),
                 nd => throw new ArgumentException("Syscall functions are not supported by this interpreter"));

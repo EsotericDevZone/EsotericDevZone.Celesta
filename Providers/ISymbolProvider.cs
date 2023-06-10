@@ -55,6 +55,8 @@ namespace EsotericDevZone.Celesta.Providers
         IEnumerable<Function> Find(string package, string name, string scope, DataType[] argTypes);
         IEnumerable<Function> Find(string package, string name, string scope, DataType[] argTypes, DataType outputType);
         Function Resolve(Identifier identifier, string scope, DataType[] argTypes, bool strict);
+        Function Fit(Identifier identifier, string scope, DataType[] argTypes, bool strict);
+
     }
 
     public interface IOperatorProvider : ISymbolProvider<Operator>

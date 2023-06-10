@@ -13,14 +13,12 @@ namespace EsotericDevZone.Celesta.AST.Utils
 
         public IASTNode GetDefaultValue(DataType type)
         {
-            try
-            {
+            if (DefaultValues.ContainsKey(type))
                 return DefaultValues[type]();
-            }
-            catch(KeyNotFoundException)
-            {
+
+            if (!type.IsAlias)
                 throw new ArgumentException($"No default value set for type {type.FullName}");
-            }
+            return GetDefaultValue(type.AliasedType);
         }
 
         public void SetDefaultValue(DataType type, Func<IASTNode> valueNode)

@@ -7,5 +7,11 @@
         {
             Source = source;            
         }
+
+        public override string ToString()
+        {
+            return $"import {Source}";
+        }
+
     }
 }

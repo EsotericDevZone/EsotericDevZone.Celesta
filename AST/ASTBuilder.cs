@@ -158,9 +158,16 @@ namespace EsotericDevZone.Celesta.AST
 
                 decl.AssignedExpression = assignExprNode;
 
-                if (decl.AssignedExpression.OutputType.FullName != variable.DataType.FullName)
+                if (decl.AssignedExpression.OutputType != variable.DataType) 
                 {
-                    return BuildNodeResult.Error("Type mismatch in variable declaration");
+                    if (variable.DataType.IsAliasOf(decl.AssignedExpression.OutputType)) 
+                    {
+                        // ...
+                    }
+                    else
+                    {
+                        return BuildNodeResult.Error("Type mismatch in variable declaration");
+                    }
                 }
 
                 variableProv.Add(variable);                
@@ -421,7 +428,8 @@ namespace EsotericDevZone.Celesta.AST
                 Function function = null;
                 if (functor is Identifier funIdentifier) 
                 {
-                    function = functionProv.Resolve(funIdentifier, scope, argTypes, strict: true);                    
+                    //function = functionProv.Resolve(funIdentifier, scope, argTypes, strict: true);
+                    function = functionProv.Fit(funIdentifier, scope, argTypes, strict: true);
                     if (function == null)
                         return BuildNodeResult.Error($"No function defined: {funIdentifier.FullName}({argTypes.JoinToString(",")})");                    
                 }
