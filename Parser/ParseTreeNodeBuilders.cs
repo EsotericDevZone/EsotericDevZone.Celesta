@@ -121,12 +121,12 @@ namespace EsotericDevZone.Celesta.Parser
             if (results.Length == 3)
                 return new ParseResult(results[1].GeneratorToken,
                     new SyscallFunctionHeader((int)results[0].Value, (string)results[1].Value,
-                        Arrays.Empty<FunctionArgumentDeclaration>(), results[2].Value as IParseTreeNode));
+                        Arrays.Empty<FunctionArgumentDeclaration>(), results[2].Value as Identifier));
             else // if (results.Length == 4)                          
                 return new ParseResult(results[1].GeneratorToken,
                     new SyscallFunctionHeader((int)results[0].Value, (string)results[1].Value,
                         (results[2].Value as ParseResult[]).Select(_ => _.Value as FunctionArgumentDeclaration).ToArray(),
-                        results[3].Value as IParseTreeNode));           
+                        results[3].Value as Identifier));
         }
 
         public static ParseResult FunctionDeclaration(ParseResult[] results)

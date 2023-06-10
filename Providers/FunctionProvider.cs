@@ -1,4 +1,5 @@
 ﻿using EsotericDevZone.Celesta.Definitions;
+using EsotericDevZone.Celesta.Definitions.Functions;
 using EsotericDevZone.Celesta.Parser.ParseTree;
 using EsotericDevZone.Core;
 using System;
@@ -10,6 +11,11 @@ namespace EsotericDevZone.Celesta.Providers
 {
     internal class FunctionProvider : AbstractSymbolProvider<Function>, IFunctionProvider
     {
+        public Function GetBySyscallId(int syscallId)
+        {
+            return Where(f => f is SyscallFunction sc && sc.SyscallId == syscallId).FirstOrDefault();
+        }
+
         public IEnumerable<Function> Find(string name, string scope, DataType[] argTypes)
         {
             return Find(name, scope).Where(f=>f.ArgumentTypes.SequenceEqual(argTypes));

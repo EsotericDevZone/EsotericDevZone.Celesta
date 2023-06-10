@@ -509,6 +509,41 @@ namespace EsotericDevZone.Celesta.AST
                 var node = new ImportNode(parent, path);
                 return BuildNodeResult.Node(node);
             }
+            else if(parseTreeNode is SyscallFunctionHeader syscallFunctionHeader)
+            {
+                var package = AbstractASTNode.GetPackage(parent);
+                var scope = AbstractASTNode.GetScope(parent);
+
+                var declArgs = syscallFunctionHeader.Arguments;
+                var declOut = syscallFunctionHeader.DataType;
+
+
+                List<DataType> argTypes = new List<DataType>();
+
+                foreach (var arg in declArgs)
+                {
+                    var dt = dataTypeProv.Resolve(arg.DataType, scope, false);
+                    if (dt == null)
+                        return BuildNodeResult.Error($"Unknown type : {arg.DataType}");
+                    argTypes.Add(dt);
+                }
+
+
+                var outDataType = dataTypeProv.Resolve(declOut, scope, false);
+
+                if (outDataType == null)
+                    return BuildNodeResult.Error($"Unknown type : {outDataType}");
+
+
+
+                var syscall = new SyscallFunction(syscallFunctionHeader.SyscallId, syscallFunctionHeader.Name, package, scope,
+                    argTypes.ToArray(), outDataType);
+
+                var syscallNode = new FunctionDeclarationNode(parent) { Function = syscall };
+
+                functionProv.Add(syscall);
+                return BuildNodeResult.Node(syscallNode);
+            }
 
 
             return BuildNodeResult.Error($"Unknown node : {parseTreeNode.GetType().Name}");

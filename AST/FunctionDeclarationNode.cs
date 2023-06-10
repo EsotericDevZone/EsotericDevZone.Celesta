@@ -26,7 +26,9 @@ namespace EsotericDevZone.Celesta.AST
                 return $"function {udf.FullName}({udf.FormalParameters.Select(p => $"{p.Type} {p.Name}").JoinToString(",")}) : {OutputType}\n" +
                     $"begin\n{Body.ToString().Indent("    ")}\nendfunction";
             else if (Function is BuiltInFunction bif)
-                return $"<builtin> function {bif.FullName}({bif.ArgumentTypes.JoinToString(",")}) : {OutputType}\n";
+                return $"<builtin> function {bif.FullName}({bif.ArgumentTypes.JoinToString(",")}) : {OutputType}";
+            else if (Function is SyscallFunction syscall)
+                return $"<syscall {syscall.SyscallId}> function {syscall.FullName}({syscall.ArgumentTypes.JoinToString(",")}) : {OutputType}";
             return Function.ToString();
         }
 

@@ -7,9 +7,9 @@ namespace EsotericDevZone.Celesta.Parser.ParseTree
         public int SyscallId { get; }
         public string Name { get; }
         public FunctionArgumentDeclaration[] Arguments { get; }
-        public IParseTreeNode DataType { get; }
+        public Identifier DataType { get; }
 
-        public SyscallFunctionHeader(int syscallId, string name, FunctionArgumentDeclaration[] arguments, IParseTreeNode dataType)
+        public SyscallFunctionHeader(int syscallId, string name, FunctionArgumentDeclaration[] arguments, Identifier dataType)
         {
             SyscallId = syscallId;
             Name = name;

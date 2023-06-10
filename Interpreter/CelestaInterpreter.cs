@@ -86,6 +86,7 @@ namespace EsotericDevZone.Celesta.Interpreter
 
         private Dictionary<Operator, OperatorImplementation> OperatorImplementations = new Dictionary<Operator, OperatorImplementation>();
         private Dictionary<Function, FunctionImplementation> FunctionImplementations = new Dictionary<Function, FunctionImplementation>();
+        private Dictionary<int, FunctionImplementation> SyscallImplementations = new Dictionary<int, FunctionImplementation>();
 
         public DataType GetTypeByFullName(string name)
         {
@@ -93,6 +94,15 @@ namespace EsotericDevZone.Celesta.Interpreter
             if (identifier == null)
                 throw new ArgumentException("Input is not a valid identifier name");
             return DataTypeProvider.Resolve(identifier, "@main", true);
+        }
+
+        public void AddSyscallFunction(int syscallId, string[] argTypes, string outType, Func<ValueObject[], ValueObject> func)
+        {
+            var inT = argTypes.Select(GetTypeByFullName).ToArray();
+            var outT = GetTypeByFullName(outType);
+            var fun = new SyscallFunction(0, "!!syscall_placeholder", "", "", inT, outT);
+            var impl = new FunctionImplementation(fun, func);
+            SyscallImplementations[syscallId] = impl;
         }
 
         public void AddBuiltInFunction(string funName, string[] argTypes, string outType, Func<ValueObject[], ValueObject> func)
@@ -218,19 +228,32 @@ namespace EsotericDevZone.Celesta.Interpreter
                 if (FunctionImplementations.ContainsKey(fun))
                     throw new ArgumentException($"Function implementation already defined : {fun}");
 
-                FunctionImplementations[fun] = new FunctionImplementation(fun, args =>
+                if (fdecl.Function is UserDefinedFunction udf)
                 {
-                    var context = new LocalContext(localContext);
-                    var udf = (fdecl.Function as UserDefinedFunction);
-                    for (int i=0;i<udf.FormalParameters.Length;i++)
+                    FunctionImplementations[fun] = new FunctionImplementation(fun, args =>
                     {
-                        context.FormalParameters[udf.FormalParameters[i].Name] = args[i];
-                    }
-                    var result = Execute(fdecl.Body, context);
-                    result.ScopeMustReturn = false;
-                    return result;
-                });
+                        var context = new LocalContext(localContext);
+                        for (int i = 0; i < udf.FormalParameters.Length; i++)
+                        {
+                            context.FormalParameters[udf.FormalParameters[i].Name] = args[i];
+                        }
+                        var result = Execute(fdecl.Body, context);
+                        result.ScopeMustReturn = false;
+                        return result;
+                    });
+                }
+                else if(fdecl.Function is SyscallFunction syscall)
+                {
+                    if (!SyscallImplementations.ContainsKey(syscall.SyscallId))
+                        throw new ArgumentException($"No implementation found for syscall function : {syscall}");
 
+                    var impl = SyscallImplementations[syscall.SyscallId];
+
+                    Validation.ThrowIf(impl.FunctionDefinition.OutputType != fun.OutputType, $"Syscall implementation does not match signature definition: {fun}");
+                    Validation.ThrowIf(!impl.FunctionDefinition.ArgumentTypes.SequenceEqual(fun.ArgumentTypes), $"Syscall implementation does not match signature definition: {fun}");
+
+                    FunctionImplementations[fun] = new FunctionImplementation(fun, impl.Operation);
+                }
 
                 return new ValueObject(VoidType, null);
             }
@@ -346,9 +369,9 @@ namespace EsotericDevZone.Celesta.Interpreter
             var _ast = ASTBuilder.BuildNode(_node);
             Console.WriteLine(_ast);
 
-            AbstractASTNode.AssertAllNodes<FunctionDeclarationNode>(_ast, nd => !(nd.Function is SyscallFunction),
+            /*AbstractASTNode.AssertAllNodes<FunctionDeclarationNode>(_ast, nd => !(nd.Function is SyscallFunction),
                 nd => throw new ArgumentException("Syscall functions are not supported by this interpreter"));
-            //_ast.
+            */
             return Execute(_ast, null).Value;
         }
 
