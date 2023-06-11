@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace EsotericDevZone.Celesta.Interpreter
 {
-    internal class LocalContext
+    public class LocalContext
     {
         public Dictionary<string, ValueObject> FormalParameters = new Dictionary<string, ValueObject>();
         

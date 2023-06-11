@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace EsotericDevZone.Celesta.AST
 {
-    internal class PackageNode : AbstractASTNode, IBlockNode
+    public class PackageNode : AbstractASTNode, IBlockNode
     {
         public string Name { get; }
         public string FullName { get; }

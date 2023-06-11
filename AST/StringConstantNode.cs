@@ -3,7 +3,7 @@ using EsotericDevZone.Core;
 
 namespace EsotericDevZone.Celesta.AST
 {
-    internal class StringConstantNode : AbstractExpressionNode
+    public class StringConstantNode : AbstractExpressionNode
     {
         public string Value { get; }
         public StringConstantNode(IASTNode parent, string value, DataType type) : base(parent, type)

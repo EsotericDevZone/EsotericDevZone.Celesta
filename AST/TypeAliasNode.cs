@@ -2,7 +2,7 @@
 
 namespace EsotericDevZone.Celesta.AST
 {
-    internal class TypeAliasNode : AbstractASTNode
+    public class TypeAliasNode : AbstractASTNode
     {
         internal TypeAliasNode(IASTNode parent, DataType newType, DataType referencedType) : base(parent)
         {

@@ -3,7 +3,7 @@ using System;
 
 namespace EsotericDevZone.Celesta.Interpreter.Implementations
 {
-    internal class OperatorImplementation
+    public class OperatorImplementation
     {
         public Operator OperatorDefinition { get; }
         public Func<ValueObject[], ValueObject> Operation { get; }

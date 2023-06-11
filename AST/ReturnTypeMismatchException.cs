@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace EsotericDevZone.Celesta.AST
 {
     [Serializable]
-    internal class ReturnTypeMismatchException : Exception
+    public class ReturnTypeMismatchException : Exception
     {
         public ReturnTypeMismatchException()
         {

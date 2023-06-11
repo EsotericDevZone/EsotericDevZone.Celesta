@@ -2,7 +2,7 @@
 
 namespace EsotericDevZone.Celesta.AST
 {
-    internal class VariableDeclarationNode : AbstractASTNode
+    public class VariableDeclarationNode : AbstractASTNode
     {
         
         public VariableNode VariableNode { get; internal set; }        

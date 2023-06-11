@@ -150,6 +150,7 @@
   <ItemGroup />
   <ItemGroup>
     <Content Include="esodev2.ico" />
+    <Content Include="icon.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

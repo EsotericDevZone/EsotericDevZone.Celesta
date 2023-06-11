@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace EsotericDevZone.Celesta.Definitions
 {
     [Serializable]
-    internal class SymbolInitializationException : Exception
+    public class SymbolInitializationException : Exception
     {
         public SymbolInitializationException()
         {

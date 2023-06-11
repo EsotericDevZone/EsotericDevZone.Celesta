@@ -2,7 +2,7 @@
 
 namespace EsotericDevZone.Celesta.AST
 {
-    internal class AssignmentNode : AbstractASTNode
+    public class AssignmentNode : AbstractASTNode
     {
         internal AssignmentNode(IASTNode parent) : base(parent)
         {

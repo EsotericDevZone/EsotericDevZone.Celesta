@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace EsotericDevZone.Celesta.Interpreter
 {
-    internal class ImportResolver : IImportResolver
+    public class ImportResolver : IImportResolver
     {
         public ISet<string> SourcesLookupPaths = new HashSet<string>();
 

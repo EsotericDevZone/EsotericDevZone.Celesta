@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace EsotericDevZone.Celesta.AST
 {
-    internal class OperatorNode : AbstractASTNode, IExpressionNode
+    public class OperatorNode : AbstractASTNode, IExpressionNode
     {
         internal OperatorNode(IASTNode parent) : base(parent)
         {            
