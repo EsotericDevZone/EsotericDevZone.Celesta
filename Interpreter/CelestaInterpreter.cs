@@ -35,8 +35,10 @@ namespace EsotericDevZone.Celesta.Interpreter
 
         public IImportResolver ImportResolver = new ImportResolver();
 
+        DataTypeDefaultValueGetter TypeDefaults = new DataTypeDefaultValueGetter();
+
         public CelestaInterpreter()
-        {
+        {            
             var Int = IntegerType = DataType.Primitive("int", "", "@main");
             var Decimal = DecimalType = DataType.Primitive("decimal", "", "@main");
             var String = StringType = DataType.Primitive("string", "", "@main");
@@ -68,14 +70,13 @@ namespace EsotericDevZone.Celesta.Interpreter
             AddOperator("-", "int", "int", (a) => new ValueObject(Int, -(int)a.Value));
 
             AddOperator("+", "string", "string", "string", (a, b) => new ValueObject(String, (string)a.Value + (string)b.Value));
+            
+            TypeDefaults.SetDefaultValue(Int, () => new IntegerConstantNode(null, 0, Int));
+            TypeDefaults.SetDefaultValue(Decimal, () => new RealConstantNode(null, 0.0, Decimal));
+            TypeDefaults.SetDefaultValue(String, () => new StringConstantNode(null, "", String));
+            TypeDefaults.SetDefaultValue(Bool, () => new BooleanConstantNode(null, false, Bool));
 
-            var typeDefaults = new DataTypeDefaultValueGetter();
-            typeDefaults.SetDefaultValue(Int, () => new IntegerConstantNode(null, 0, Int));
-            typeDefaults.SetDefaultValue(Decimal, () => new RealConstantNode(null, 0.0, Decimal));
-            typeDefaults.SetDefaultValue(String, () => new StringConstantNode(null, "", String));
-            typeDefaults.SetDefaultValue(Bool, () => new BooleanConstantNode(null, false, Bool));
-
-            ASTBuilder = new ASTBuilder(DataTypeProvider, VariableProvider, FunctionProvider, OperatorProvider, typeDefaults);
+            ASTBuilder = new ASTBuilder(DataTypeProvider, VariableProvider, FunctionProvider, OperatorProvider, TypeDefaults);
             ASTBuilder.ImportResolver = ImportResolver;
             ASTBuilder.IntegerConstantType = DataTypeProvider.Find("int", "@main").First();
             ASTBuilder.RealConstantType = DataTypeProvider.Find("decimal", "@main").First();
@@ -148,15 +149,41 @@ namespace EsotericDevZone.Celesta.Interpreter
         CelestaParser Parser = new CelestaParser();
 
         Dictionary<string, ValueObject> Variables = new Dictionary<string, ValueObject>();
+        Dictionary<int, ValueObject> Parameters = new Dictionary<int, ValueObject>();
 
         private void SetVariableValue(VariableNode variable, ValueObject value)
         {
-            Variables[variable.Variable.FullName] = value;
+            if (variable.IsParameter)
+            {
+                Parameters[variable.ParamId] = value;
+            }
+            else
+            {
+                Variables[variable.Variable.FullName] = value;
+            }
         }
 
         private ValueObject GetVariableValue(VariableNode variable)
         {
+            if (variable.IsParameter) 
+            {                
+                var value = Parameters.ContainsKey(variable.ParamId)
+                    ? Parameters[variable.ParamId]
+                    : ExecuteAST(TypeDefaults.GetDefaultValue(variable.OutputType), null);
+
+                if (value.DataType != variable.OutputType && !value.DataType.IsDerivedFrom(variable.OutputType)) 
+                {
+                    throw new ArgumentException($"Parameter type mismatch: expected {variable.OutputType}, got {value.DataType}");
+                }
+
+                return value;
+            }            
             return Variables[variable.Variable.FullName];
+        }
+
+        public void SetParameter(int id, int value)
+        {
+            Parameters[id] = new ValueObject(IntegerType, value);
         }
 
         private ValueObject ExecuteAST(IASTNode node, LocalContext localContext)
@@ -189,8 +216,13 @@ namespace EsotericDevZone.Celesta.Interpreter
                 return new ValueObject(VoidType, null);
             }
             if (node is VariableDeclarationNode vdecl) 
-            {
+            {                
                 var variable = vdecl.VariableNode;
+                if(variable.IsParameter)
+                {
+                    return GetVariableValue(variable);
+                }
+
                 var expression = vdecl.AssignedExpression;
                 var value = ExecuteAST(expression, localContext);
                 SetVariableValue(variable, value);

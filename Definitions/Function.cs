@@ -15,6 +15,6 @@ namespace EsotericDevZone.Celesta.Definitions
         public DataType[] ArgumentTypes { get; }
         public DataType OutputType { get; }
 
-        public override string ToString() => $"{base.ToString()}({ArgumentTypes.JoinToString(",")})->{OutputType}";
+        public override string ToString() => $"{base.ToString()}({ArgumentTypes.JoinToString(",")})->{OutputType?.ToString() ?? "?"}";
     }
 }

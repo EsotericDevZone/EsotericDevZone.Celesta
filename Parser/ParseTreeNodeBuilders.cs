@@ -87,6 +87,15 @@ namespace EsotericDevZone.Celesta.Parser
         public static ParseResult Block(ParseResult[] results) =>
             new ParseResult(null, new Block(results.Select(_ => _.Value as IParseTreeNode).ToArray()));
 
+        public static ParseResult ParameterVariableDeclaration(ParseResult[] results)
+        {            
+            if (results.Length == 3)
+                return new ParseResult(results[0].GeneratorToken,
+                    new VariableDeclaration(results[0].Value as Identifier, results[1].Value as string, (int)results[2].Value));
+            throw new ParseException("Invalid parameter variable declaration");
+
+        }
+
         public static ParseResult VariableDeclaration(ParseResult[] results)
         {
             if (results.Length == 2)

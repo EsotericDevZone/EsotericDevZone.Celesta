@@ -1,156 +1,47 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{B5DABA47-76D9-4701-AE07-DBA19EAC1CE0}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>EsotericDevZone.Celesta</RootNamespace>
-    <AssemblyName>EsotericDevZone.Celesta</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <Deterministic>true</Deterministic>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <ApplicationIcon>esodev2.ico</ApplicationIcon>
+    <SignAssembly>True</SignAssembly>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>EsotericDevZone.Celesta</Title>
+    <Authors>NotImplementedLife</Authors>
+    <Description>Implementation of Celesta programming language</Description>
+    <Copyright>Copyright ©NotImplementedLife 2023</Copyright>
+    <PackageProjectUrl>https://github.com/EsotericDevZone/EsotericDevZone.Celesta</PackageProjectUrl>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/EsotericDevZone/EsotericDevZone.Celesta</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <AssemblyVersion>1.4.0</AssemblyVersion>
+    <FileVersion>1.4.0</FileVersion>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <Version>1.4.0</Version>
   </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="EsotericDevZone.Core, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\EsotericDevZone.Core.1.2.0\lib\net46\EsotericDevZone.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="EsotericDevZone.RuleBasedParser, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\EsotericDevZone.RuleBasedParser.1.2.0\lib\net46\EsotericDevZone.RuleBasedParser.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="AST\AbstractASTNode.cs" />
-    <Compile Include="AST\AbstractExpressionNode.cs" />
-    <Compile Include="AST\AssignmentNode.cs" />
-    <Compile Include="AST\ASTBuilder.cs" />
-    <Compile Include="AST\ASTBuildNodeException.cs" />
-    <Compile Include="AST\BooleanConstantNode.cs" />
-    <Compile Include="AST\FunctionFormalParameterNode.cs" />
-    <Compile Include="AST\IfNode.cs" />
-    <Compile Include="AST\ImportNode.cs" />
-    <Compile Include="AST\OperatorNode.cs" />
-    <Compile Include="AST\RepeatNNode.cs" />
-    <Compile Include="AST\ReturnNode.cs" />
-    <Compile Include="AST\ReturnTypeMismatchException.cs" />
-    <Compile Include="AST\ScopedNode.cs" />
-    <Compile Include="AST\IASTNode.cs" />
-    <Compile Include="AST\IBlockNode.cs" />
-    <Compile Include="AST\IExpressionNode.cs" />
-    <Compile Include="AST\IntegerConstantNode.cs" />
-    <Compile Include="AST\PackageNode.cs" />
-    <Compile Include="AST\RealConstantNode.cs" />
-    <Compile Include="AST\StringConstantNode.cs" />
-    <Compile Include="AST\FunctionDeclarationNode.cs" />
-    <Compile Include="AST\FunctionCallNode.cs" />
-    <Compile Include="AST\TypeAliasNode.cs" />
-    <Compile Include="AST\Utils\IImportResolver.cs" />
-    <Compile Include="AST\VariableDeclarationNode.cs" />
-    <Compile Include="AST\VariableNode.cs" />
-    <Compile Include="AST\VoidExpressionNode.cs" />
-    <Compile Include="AST\WhileNode.cs" />
-    <Compile Include="Interpreter\CelestaInterpreter.cs" />
-    <Compile Include="Counters\FunctionalStringCounter.cs" />
-    <Compile Include="Counters\ICounter.cs" />
-    <Compile Include="Counters\IncrementCounter.cs" />
-    <Compile Include="Counters\IStringCounter.cs" />
-    <Compile Include="Definitions\AbstractSymbol.cs" />
-    <Compile Include="Definitions\DataType.cs" />
-    <Compile Include="Definitions\Function.cs" />
-    <Compile Include="Definitions\Functions\BuiltInFunction.cs" />
-    <Compile Include="Definitions\Functions\SyscallFunction.cs" />
-    <Compile Include="Definitions\Functions\UserDefinedFunction.cs" />
-    <Compile Include="Definitions\ISymbol.cs" />
-    <Compile Include="Definitions\Operator.cs" />
-    <Compile Include="Definitions\SymbolInitializationException.cs" />
-    <Compile Include="Definitions\Variable.cs" />
-    <Compile Include="Extensions\SymbolExtensions.cs" />
-    <Compile Include="Interpreter\Implementations\FunctionImplementation.cs" />
-    <Compile Include="Interpreter\Implementations\OperatorImplementation.cs" />
-    <Compile Include="Interpreter\ImportResolver.cs" />
-    <Compile Include="Interpreter\LocalContext.cs" />
-    <Compile Include="Interpreter\ValueObject.cs" />
-    <Compile Include="Language.cs" />
-    <Compile Include="Parser\LiteralException.cs" />
-    <Compile Include="Parser\ParseTree\Block.cs" />
-    <Compile Include="Parser\ParseTree\BoolLiteral.cs" />
-    <Compile Include="Parser\ParseTree\FunctionArgumentDeclaration.cs" />
-    <Compile Include="Parser\ParseTree\FunctionDeclaration.cs" />
-    <Compile Include="Parser\ParseTree\IfBlock.cs" />
-    <Compile Include="Parser\ParseTree\FunctionCall.cs" />
-    <Compile Include="Parser\ParseTree\Import.cs" />
-    <Compile Include="Parser\ParseTree\NameAccessor.cs" />
-    <Compile Include="Parser\ParseTree\Assignment.cs" />
-    <Compile Include="Parser\CelestaParser.cs" />
-    <Compile Include="Parser\CelestaTokensSplitOptions.cs" />
-    <Compile Include="Parser\OperatorsRuleBuilder.cs" />
-    <Compile Include="Parser\ParseTreeAtomBuilders.cs" />
-    <Compile Include="Parser\ParseTreeNodeBuilders.cs" />
-    <Compile Include="Parser\ParseTree\BinaryOperator.cs" />
-    <Compile Include="Parser\ParseTree\Identifier.cs" />
-    <Compile Include="Parser\ParseTree\IParseTreeNode.cs" />
-    <Compile Include="Parser\ParseTree\NumericLiteral.cs" />
-    <Compile Include="Parser\ParseTree\Package.cs" />
-    <Compile Include="Parser\ParseTree\RepeatN.cs" />
-    <Compile Include="Parser\ParseTree\Return.cs" />
-    <Compile Include="Parser\ParseTree\StringLiteral.cs" />
-    <Compile Include="Parser\ParseTree\SyscallFunctionHeader.cs" />
-    <Compile Include="Parser\ParseTree\TypeAlias.cs" />
-    <Compile Include="Parser\ParseTree\UnaryOperator.cs" />
-    <Compile Include="Parser\ParseTree\VariableDeclaration.cs" />
-    <Compile Include="Parser\ParseTree\WhileBlock.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Providers\AbstractSymbolProvider.cs" />
-    <Compile Include="Providers\DataTypeProvider.cs" />
-    <Compile Include="Providers\FunctionProvider.cs" />
-    <Compile Include="Providers\ISymbolProvider.cs" />
-    <Compile Include="Providers\MultipleDefinitionException.cs" />
-    <Compile Include="Providers\OperatorProvider.cs" />
-    <Compile Include="Providers\VariableProvider.cs" />
-    <Compile Include="Utils.cs" />
-    <Compile Include="AST\Utils\DataTypeDefaultValueGetter.cs" />
-    <Compile Include="AST\Utils\IDataTypeDefaultValueGetter.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup />
+
   <ItemGroup>
     <Content Include="esodev2.ico" />
-    <Content Include="icon.png" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+
+  <ItemGroup>
+    <PackageReference Include="EsotericDevZone.Core" Version="1.4.1" />
+    <PackageReference Include="EsotericDevZone.RuleBasedParser" Version="1.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="icon.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Update="LICENSE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Update="README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
 </Project>

@@ -11,7 +11,7 @@ namespace EsotericDevZone.Celesta.AST
     {
         public bool Value { get; }
 
-        internal BooleanConstantNode(IASTNode parent, bool value, DataType type) : base(parent, type)
+        public BooleanConstantNode(IASTNode parent, bool value, DataType type) : base(parent, type)
         {
             Value = value;
         }

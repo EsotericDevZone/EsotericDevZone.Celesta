@@ -52,6 +52,7 @@ namespace EsotericDevZone.Celesta.Parser
             ParseRules.RegisterRule("@WHILE", "while @EXPR do @BLOCK end|endwhile", ParseTreeNodeBuilders.While);
             ParseRules.RegisterRule("@REPTN", "repeat @EXPR do @BLOCK end|endrepeat", ParseTreeNodeBuilders.RepeatN);
 
+            ParseRules.RegisterRule("@VDECL", "param @IDENTIFIER SYMBOL id INT", ParseTreeNodeBuilders.ParameterVariableDeclaration);
             ParseRules.RegisterRule("@VDECL", "@IDENTIFIER SYMBOL = @EXPR", ParseTreeNodeBuilders.VariableDeclaration);
             ParseRules.RegisterRule("@VDECL", "@IDENTIFIER SYMBOL", ParseTreeNodeBuilders.VariableDeclaration);
 

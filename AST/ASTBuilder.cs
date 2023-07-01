@@ -16,11 +16,11 @@ namespace EsotericDevZone.Celesta.AST
 {
     public class ASTBuilder
     {
-        public DataType IntegerConstantType { get; internal set; }
-        public DataType RealConstantType { get; internal set; }
-        public DataType StringConstantType { get; internal set; }
-        public DataType BooleanConstantType { get; internal set; }
-        public DataType VoidType { get; internal set; }
+        public DataType IntegerConstantType { get; set; }
+        public DataType RealConstantType { get; set; }
+        public DataType StringConstantType { get; set; }
+        public DataType BooleanConstantType { get; set; }
+        public DataType VoidType { get; set; }
         public IDataTypeDefaultValueGetter DataTypeDefaultValues { get; internal set; }
 
 
@@ -138,11 +138,11 @@ namespace EsotericDevZone.Celesta.AST
                     return BuildNodeResult.Error($"Duplicate variable definition : {varName}");
                 }
 
-                var variable = new Variable(varName, package, scope, dataType);
+                var variable = new Variable(varName, package, scope, dataType, varDeclaraction.IsParameter, varDeclaraction.ParamId);
 
                 var decl = new VariableDeclarationNode(parent);
 
-                var variableNode = new VariableNode(decl, variable);
+                var variableNode = new VariableNode(decl, variable);                
                 decl.VariableNode = variableNode;
 
                 var assignedExpression = varDeclaraction.InitializationValue != null
@@ -156,7 +156,7 @@ namespace EsotericDevZone.Celesta.AST
                 if (assignedExpression.Failed)
                     return assignedExpression;
 
-                decl.AssignedExpression = assignExprNode;
+                decl.AssignedExpression = assignExprNode;                
 
                 if (decl.AssignedExpression.OutputType != variable.DataType) 
                 {

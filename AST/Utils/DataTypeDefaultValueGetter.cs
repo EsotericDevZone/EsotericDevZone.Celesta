@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace EsotericDevZone.Celesta.AST.Utils
 {
-    internal class DataTypeDefaultValueGetter : IDataTypeDefaultValueGetter
+    public class DataTypeDefaultValueGetter : IDataTypeDefaultValueGetter
     {
         public Dictionary<DataType, Func<IASTNode>> DefaultValues { get; } = new Dictionary<DataType, Func<IASTNode>>();
 
