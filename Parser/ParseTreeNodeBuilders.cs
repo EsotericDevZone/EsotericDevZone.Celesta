@@ -72,6 +72,42 @@ namespace EsotericDevZone.Celesta.Parser
                     new IfBlock(results[0].Value as IParseTreeNode, results[1].Value as Block, results[2].Value as Block));
         }
 
+        public static ParseResult Elifs(ParseResult[] results)
+        {
+            var result = results[results.Length - 1].Value as IfBlock;
+            for(int i=results.Length-2;i>=0;i--)
+            {
+                var r = results[i].Value as IfBlock;
+                r.ElseBranch = new Block(Arrays.Of(result));
+                result = r;
+            }
+            return new ParseResult(results[0].GeneratorToken, result);
+        }
+
+        public static ParseResult IfWithElifsElse(ParseResult[] results)
+        {
+            var ifs = new Block(Arrays.Of(results[2].Value as IfBlock));
+
+            var elseBranch = results[3].Value as Block;
+
+            var i = ifs.Children[0] as IfBlock;
+            while (i.ElseBranch!=null)
+            {
+                i = i.ElseBranch.Children[0] as IfBlock;
+            }
+            i.ElseBranch = elseBranch;
+
+            return new ParseResult(results[0].GeneratorToken,
+                    new IfBlock(results[0].Value as IParseTreeNode, results[1].Value as Block, ifs));
+        }
+
+        public static ParseResult IfWithElifs(ParseResult[] results)
+        {
+            return new ParseResult(results[0].GeneratorToken,
+                    new IfBlock(results[0].Value as IParseTreeNode, results[1].Value as Block, new Block(Arrays.Of(results[2].Value as IfBlock))));
+        }
+        
+
         public static ParseResult While(ParseResult[] results)
         {            
             return new ParseResult(results[0].GeneratorToken,

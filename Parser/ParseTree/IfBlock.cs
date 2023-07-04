@@ -7,7 +7,7 @@ namespace EsotericDevZone.Celesta.Parser.ParseTree
         public IParseTreeNode Condition { get; }
 
         public Block ThenBranch { get; }
-        public Block ElseBranch { get; }
+        public Block ElseBranch { get; internal set; }
 
         public IfBlock(IParseTreeNode condition, Block thenBranch, Block elseBranch)
         {

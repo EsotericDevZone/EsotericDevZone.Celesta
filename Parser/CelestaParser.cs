@@ -46,8 +46,14 @@ namespace EsotericDevZone.Celesta.Parser
 
             ParseRules.RegisterRule("@ASSIGN", "@TERM = @EXPR", ParseTreeNodeBuilders.Assignment);
 
+            ParseRules.RegisterRule("@ELIF", "elif @EXPR then @BLOCK", ParseTreeNodeBuilders.If);
+            ParseRules.RegisterRule("@ELIFLIST", "@ELIF ?? @ELIF", ParseTreeNodeBuilders.Elifs);
+
+            ParseRules.RegisterRule("@IF", "if @EXPR then @BLOCK @ELIFLIST else @BLOCK end|endif", ParseTreeNodeBuilders.IfWithElifsElse);
+            ParseRules.RegisterRule("@IF", "if @EXPR then @BLOCK @ELIFLIST end|endif", ParseTreeNodeBuilders.IfWithElifs);            
+
             ParseRules.RegisterRule("@IF", "if @EXPR then @BLOCK else @BLOCK end|endif", ParseTreeNodeBuilders.If);
-            ParseRules.RegisterRule("@IF", "if @EXPR then @BLOCK end|endif", ParseTreeNodeBuilders.If);
+            ParseRules.RegisterRule("@IF", "if @EXPR then @BLOCK end|endif", ParseTreeNodeBuilders.If);            
 
             ParseRules.RegisterRule("@WHILE", "while @EXPR do @BLOCK end|endwhile", ParseTreeNodeBuilders.While);
             ParseRules.RegisterRule("@REPTN", "repeat @EXPR do @BLOCK end|endrepeat", ParseTreeNodeBuilders.RepeatN);
